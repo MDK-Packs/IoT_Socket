@@ -292,7 +292,11 @@ int32_t iotSocketRecv (int32_t socket, void *buf, uint32_t len) {
 
   rc = recv(socket, buf, (int)len, 0);
   if (rc < 0) {
-    rc = rc_bsd_to_iot(rc);
+    if (rc == BSD_ETIMEDOUT) {
+      rc = IOT_SOCKET_EAGAIN;
+    } else {
+      rc = rc_bsd_to_iot(rc);
+    }
   }
 
   return rc;
@@ -304,7 +308,11 @@ int32_t iotSocketSend (int32_t socket, const void *buf, uint32_t len) {
 
   rc = send(socket, buf, (int)len, 0);
   if (rc < 0) {
-    rc = rc_bsd_to_iot(rc);
+    if (rc == BSD_ETIMEDOUT) {
+      rc = IOT_SOCKET_EAGAIN;
+    } else {
+      rc = rc_bsd_to_iot(rc);
+    }
   }
 
   return rc;
