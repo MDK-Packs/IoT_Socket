@@ -136,6 +136,7 @@ int32_t iotSocketBind (int32_t socket, const void *ip, uint32_t ip_len, uint16_t
 #else
   SOCKADDR_IN  addr;
 #endif
+  int32_t addr_len;
   int32_t rc;
 
   // Check parameters
@@ -149,19 +150,21 @@ int32_t iotSocketBind (int32_t socket, const void *ip, uint32_t ip_len, uint16_t
       ((SOCKADDR *)&addr)->sa_family = AF_INET;
       memcpy(&(((SOCKADDR_IN *)&addr)->sin_addr), ip, NET_ADDR_IP4_LEN);
       ((SOCKADDR_IN *)&addr)->sin_port = htons(port);
+      addr_len = sizeof(SOCKADDR_IN);
       break;
 #if defined(RTE_Network_IPv6)
     case NET_ADDR_IP6_LEN:
       ((SOCKADDR *)&addr)->sa_family = AF_INET6;
       memcpy(&(((SOCKADDR_IN6 *)&addr)->sin6_addr), ip, NET_ADDR_IP6_LEN);
       ((SOCKADDR_IN6 *)&addr)->sin6_port = htons(port);
+      addr_len = sizeof(SOCKADDR_IN6);
       break;
 #endif
     default:
       return IOT_SOCKET_EINVAL;
   }
 
-  rc = bind(socket, (SOCKADDR *)&addr, sizeof(addr));
+  rc = bind(socket, (SOCKADDR *)&addr, addr_len);
   rc = rc_bsd_to_iot(rc);
 
   return rc;
@@ -255,6 +258,7 @@ int32_t iotSocketConnect (int32_t socket, const void *ip, uint32_t ip_len, uint1
 #else
   SOCKADDR_IN  addr;
 #endif
+  int32_t addr_len;
   int32_t rc;
 
   // Check parameters
@@ -268,19 +272,21 @@ int32_t iotSocketConnect (int32_t socket, const void *ip, uint32_t ip_len, uint1
       ((SOCKADDR *)&addr)->sa_family = AF_INET;
       memcpy(&(((SOCKADDR_IN *)&addr)->sin_addr), ip, NET_ADDR_IP4_LEN);
       ((SOCKADDR_IN *)&addr)->sin_port = htons(port);
+      addr_len = sizeof(SOCKADDR_IN);
       break;
 #if defined(RTE_Network_IPv6)
     case NET_ADDR_IP6_LEN:
       ((SOCKADDR *)&addr)->sa_family = AF_INET6;
       memcpy(&(((SOCKADDR_IN6 *)&addr)->sin6_addr), ip, NET_ADDR_IP6_LEN);
       ((SOCKADDR_IN6 *)&addr)->sin6_port = htons(port);
+      addr_len = sizeof(SOCKADDR_IN6);
       break;
 #endif
     default:
       return IOT_SOCKET_EINVAL;
   }
 
-  rc = connect(socket, (SOCKADDR *)&addr, sizeof(addr));
+  rc = connect(socket, (SOCKADDR *)&addr, addr_len);
   rc = rc_bsd_to_iot(rc);
 
   return rc;
