@@ -47,8 +47,6 @@ if [ ! -d $PACK_BUILD ]; then
   mkdir $PACK_BUILD
 fi
 
-# Merge contributions into $PACK_BUILD
-# add (must not overwrite)
 # Copy file into $PACK_BUILD
 cp -f  ./$PACK_VENDOR.$PACK_NAME.pdsc $PACK_BUILD/ 
 cp -f  ./LICENSE.txt $PACK_BUILD/ 
