@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Arm Limited. All rights reserved.
+ * Copyright (c) 2018-2019 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -18,7 +18,6 @@
 
 #include <string.h>
 #include "iot_socket.h"
-#include "cmsis_os2.h"
 #include "rl_net.h"
 #include "RTE_Components.h"
 
@@ -130,7 +129,7 @@ int32_t iotSocketCreate (int32_t af, int32_t type, int32_t protocol) {
 }
 
 // Assign a local address to a socket
-int32_t iotSocketBind (int32_t socket, const void *ip, uint32_t ip_len, uint16_t port) {
+int32_t iotSocketBind (int32_t socket, const uint8_t *ip, uint32_t ip_len, uint16_t port) {
 #if defined(RTE_Network_IPv6)
   SOCKADDR_IN6 addr;
 #else
@@ -181,44 +180,19 @@ int32_t iotSocketListen (int32_t socket, int32_t backlog) {
 }
 
 // Accept a new connection on a socket
-int32_t iotSocketAccept (int32_t socket, void *ip, uint32_t *ip_len, uint16_t *port) {
+int32_t iotSocketAccept (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t *port) {
 #if defined(RTE_Network_IPv6)
   SOCKADDR_IN6 addr;
 #else
   SOCKADDR_IN  addr;
 #endif
-  int32_t type;
-  int32_t type_len = sizeof(type);
   int32_t addr_len = sizeof(addr);
   int32_t rc;
 
-  // Get Socket Type
-  rc = getsockopt(socket, SOL_SOCKET, SO_TYPE, (char *)&type, &type_len);
-  if (rc < 0) {
-    return IOT_SOCKET_ESOCK;
-  }
-
-  if (type == SOCK_STREAM) {
-    // TCP: actual accept()
-    rc = accept(socket, (SOCKADDR *)&addr, &addr_len);
-  } else {
-    // UDP: wait for message
-    char buf[1];
-    rc = recvfrom(socket, buf, sizeof(buf), MSG_PEEK, (SOCKADDR *)&addr, &addr_len);
-  }
+  rc = accept(socket, (SOCKADDR *)&addr, &addr_len);
   if (rc < 0) {
     rc = rc_bsd_to_iot(rc);
     return rc;
-  }
-
-  if (type == SOCK_DGRAM) {
-    // UDP: connect and return original socket
-    rc = connect(socket, (SOCKADDR *)&addr, addr_len);
-    if (rc < 0) {
-      rc = rc_bsd_to_iot(rc);
-      return rc;
-    }
-    rc = socket;
   }
 
   // Copy remote IP address
@@ -252,7 +226,7 @@ int32_t iotSocketAccept (int32_t socket, void *ip, uint32_t *ip_len, uint16_t *p
 }
 
 // Connect a socket to a remote host
-int32_t iotSocketConnect (int32_t socket, const void *ip, uint32_t ip_len, uint16_t port) {
+int32_t iotSocketConnect (int32_t socket, const uint8_t *ip, uint32_t ip_len, uint16_t port) {
 #if defined(RTE_Network_IPv6)
   SOCKADDR_IN6 addr;
 #else
@@ -292,7 +266,7 @@ int32_t iotSocketConnect (int32_t socket, const void *ip, uint32_t ip_len, uint1
   return rc;
 }
 
-// Receive data from a socket
+// Receive data on a connected socket
 int32_t iotSocketRecv (int32_t socket, void *buf, uint32_t len) {
   int32_t rc;
 
@@ -308,7 +282,57 @@ int32_t iotSocketRecv (int32_t socket, void *buf, uint32_t len) {
   return rc;
 }
 
-// Send data to a socket
+// Receive data on a socket
+int32_t iotSocketRecvFrom (int32_t socket, void *buf, uint32_t len, uint8_t *ip, uint32_t *ip_len, uint16_t *port) {
+#if defined(RTE_Network_IPv6)
+  SOCKADDR_IN6 addr;
+#else
+  SOCKADDR_IN  addr;
+#endif
+  int32_t addr_len = sizeof(addr);
+  int32_t rc;
+
+  rc = recvfrom(socket, buf, (int)len, 0, (SOCKADDR *)&addr, &addr_len);
+  if (rc < 0) {
+    if (rc == BSD_ETIMEDOUT) {
+      rc = IOT_SOCKET_EAGAIN;
+    } else {
+      rc = rc_bsd_to_iot(rc);
+    }
+    return rc;
+  }
+
+  // Copy remote IP address
+  if ((ip != NULL) && (ip_len != NULL)) {
+    if (((SOCKADDR *)&addr)->sa_family == AF_INET) {
+      if (*ip_len >= sizeof(((SOCKADDR_IN *)&addr)->sin_addr)) {
+        memcpy(ip, &(((SOCKADDR_IN *)&addr)->sin_addr), sizeof(((SOCKADDR_IN *)&addr)->sin_addr));
+        *ip_len = sizeof(((SOCKADDR_IN *)&addr)->sin_addr);
+      }
+    }
+#if defined(RTE_Network_IPv6)
+    else if (((SOCKADDR *)&addr)->sa_family == AF_INET6) {
+      if (*ip_len >= sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr)) {
+        memcpy(ip, &(((SOCKADDR_IN6 *)&addr)->sin6_addr), sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr));
+        *ip_len = sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr);
+      }
+    }
+#endif
+  }
+
+  // Copy remote port number
+  if (port != NULL) {
+#if defined(RTE_Network_IPv6)
+    *port = ntohs(addr.sin6_port);
+#else
+    *port = ntohs(addr.sin_port);
+#endif
+  }
+
+  return rc;
+}
+
+// Send data on a connected socket
 int32_t iotSocketSend (int32_t socket, const void *buf, uint32_t len) {
   int32_t rc;
 
@@ -324,7 +348,182 @@ int32_t iotSocketSend (int32_t socket, const void *buf, uint32_t len) {
   return rc;
 }
 
-// Set socket options
+// Send data on a socket
+int32_t iotSocketSendTo (int32_t socket, const void *buf, uint32_t len, const uint8_t *ip, uint32_t ip_len, uint16_t port) {
+#if defined(RTE_Network_IPv6)
+  SOCKADDR_IN6 addr;
+#else
+  SOCKADDR_IN  addr;
+#endif
+  int32_t addr_len;
+  int32_t rc;
+
+  if (ip != NULL) {
+    // Construct remote host address
+    switch (ip_len) {
+      case NET_ADDR_IP4_LEN:
+        ((SOCKADDR *)&addr)->sa_family = AF_INET;
+        memcpy(&(((SOCKADDR_IN *)&addr)->sin_addr), ip, NET_ADDR_IP4_LEN);
+        ((SOCKADDR_IN *)&addr)->sin_port = htons(port);
+        addr_len = sizeof(SOCKADDR_IN);
+        break;
+#if defined(RTE_Network_IPv6)
+      case NET_ADDR_IP6_LEN:
+        ((SOCKADDR *)&addr)->sa_family = AF_INET6;
+        memcpy(&(((SOCKADDR_IN6 *)&addr)->sin6_addr), ip, NET_ADDR_IP6_LEN);
+        ((SOCKADDR_IN6 *)&addr)->sin6_port = htons(port);
+        addr_len = sizeof(SOCKADDR_IN6);
+        break;
+#endif
+      default:
+        return IOT_SOCKET_EINVAL;
+    }
+    rc = sendto(socket, buf, (int)len, 0, (SOCKADDR *)&addr, addr_len);
+  } else {
+    rc = sendto(socket, buf, (int)len, 0, NULL, 0);
+  }
+
+  if (rc < 0) {
+    if (rc == BSD_ETIMEDOUT) {
+      rc = IOT_SOCKET_EAGAIN;
+    } else {
+      rc = rc_bsd_to_iot(rc);
+    }
+  }
+
+  return rc;
+}
+
+// Retrieve local IP address and port of a socket
+int32_t iotSocketGetSockName (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t *port) {
+#if defined(RTE_Network_IPv6)
+  SOCKADDR_IN6 addr;
+#else
+  SOCKADDR_IN  addr;
+#endif
+  int32_t addr_len = sizeof(addr);
+  int32_t rc;
+
+  rc = getsockname(socket, (SOCKADDR *)&addr, &addr_len);
+  if (rc < 0) {
+    rc = rc_bsd_to_iot(rc);
+    return rc;
+  }
+
+  rc = IOT_SOCKET_EINVAL;
+
+  // Copy local IP address
+  if ((ip != NULL) && (ip_len != NULL)) {
+    if (((SOCKADDR *)&addr)->sa_family == AF_INET) {
+      if (*ip_len >= sizeof(((SOCKADDR_IN *)&addr)->sin_addr)) {
+        memcpy(ip, &(((SOCKADDR_IN *)&addr)->sin_addr), sizeof(((SOCKADDR_IN *)&addr)->sin_addr));
+        *ip_len = sizeof(((SOCKADDR_IN *)&addr)->sin_addr);
+        rc = 0;
+      }
+    }
+#if defined(RTE_Network_IPv6)
+    else if (((SOCKADDR *)&addr)->sa_family == AF_INET6) {
+      if (*ip_len >= sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr)) {
+        memcpy(ip, &(((SOCKADDR_IN6 *)&addr)->sin6_addr), sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr));
+        *ip_len = sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr);
+        rc = 0;
+      }
+    }
+#endif
+  }
+
+  // Copy local port number
+  if (port != NULL) {
+#if defined(RTE_Network_IPv6)
+    *port = ntohs(addr.sin6_port);
+#else
+    *port = ntohs(addr.sin_port);
+#endif
+    rc = 0;
+  }
+
+  return rc;
+}
+
+// Retrieve remote IP address and port of a socket
+int32_t iotSocketGetPeerName (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t *port) {
+#if defined(RTE_Network_IPv6)
+  SOCKADDR_IN6 addr;
+#else
+  SOCKADDR_IN  addr;
+#endif
+  int32_t addr_len = sizeof(addr);
+  int32_t rc;
+
+  rc = getpeername(socket, (SOCKADDR *)&addr, &addr_len);
+  if (rc < 0) {
+    rc = rc_bsd_to_iot(rc);
+    return rc;
+  }
+
+  rc = IOT_SOCKET_EINVAL;
+
+  // Copy remote IP address
+  if ((ip != NULL) && (ip_len != NULL)) {
+    if (((SOCKADDR *)&addr)->sa_family == AF_INET) {
+      if (*ip_len >= sizeof(((SOCKADDR_IN *)&addr)->sin_addr)) {
+        memcpy(ip, &(((SOCKADDR_IN *)&addr)->sin_addr), sizeof(((SOCKADDR_IN *)&addr)->sin_addr));
+        *ip_len = sizeof(((SOCKADDR_IN *)&addr)->sin_addr);
+        rc = 0;
+      }
+    }
+#if defined(RTE_Network_IPv6)
+    else if (((SOCKADDR *)&addr)->sa_family == AF_INET6) {
+      if (*ip_len >= sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr)) {
+        memcpy(ip, &(((SOCKADDR_IN6 *)&addr)->sin6_addr), sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr));
+        *ip_len = sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr);
+        rc = 0;
+      }
+    }
+#endif
+  }
+
+  // Copy remote port number
+  if (port != NULL) {
+#if defined(RTE_Network_IPv6)
+    *port = ntohs(addr.sin6_port);
+#else
+    *port = ntohs(addr.sin_port);
+#endif
+    rc = 0;
+  }
+
+  return rc;
+}
+
+// Get socket option
+int32_t iotSocketGetOpt (int32_t socket, int32_t opt_id, void *opt_val, uint32_t *opt_len) {
+  int32_t rc;
+
+  switch (opt_id) {
+    case IOT_SOCKET_IO_FIONBIO:
+      return IOT_SOCKET_EINVAL;
+    case IOT_SOCKET_SO_RCVTIMEO:
+      rc = getsockopt(socket, SOL_SOCKET, SO_RCVTIMEO,  (char *)opt_val, (int *)opt_len);
+      break;
+    case IOT_SOCKET_SO_SNDTIMEO:
+      rc = getsockopt(socket, SOL_SOCKET, SO_SNDTIMEO,  (char *)opt_val, (int *)opt_len);
+      break;
+    case IOT_SOCKET_SO_KEEPALIVE:
+      rc = getsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, (char *)opt_val, (int *)opt_len);
+      break;
+    case IOT_SOCKET_SO_TYPE:
+      rc = getsockopt(socket, SOL_SOCKET, SO_TYPE,      (char *)opt_val, (int *)opt_len);
+      break;
+    default:
+      return IOT_SOCKET_ENOTSUP;
+  }
+  rc = rc_bsd_to_iot(rc);
+
+  return rc;
+}
+
+// Set socket option
 int32_t iotSocketSetOpt (int32_t socket, int32_t opt_id, const void *opt_val, uint32_t opt_len) {
   int32_t rc;
 
@@ -336,61 +535,22 @@ int32_t iotSocketSetOpt (int32_t socket, int32_t opt_id, const void *opt_val, ui
       rc = ioctlsocket(socket, FIONBIO, (unsigned long *)&opt_val);
       break;
     case IOT_SOCKET_SO_RCVTIMEO:
-      rc = setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, (const char *)opt_val, (int)opt_len);
+      rc = setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO,  (const char *)opt_val, (int)opt_len);
       break;
     case IOT_SOCKET_SO_SNDTIMEO:
-      rc = setsockopt(socket, SOL_SOCKET, SO_SNDTIMEO, (const char *)opt_val, (int)opt_len);
+      rc = setsockopt(socket, SOL_SOCKET, SO_SNDTIMEO,  (const char *)opt_val, (int)opt_len);
       break;
-    case IOT_SOCKET_SO_REUSEADDR:
+    case IOT_SOCKET_SO_KEEPALIVE:
+      rc = setsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, (const char *)opt_val, (int)opt_len);
+      break;
+    case IOT_SOCKET_SO_TYPE:
+      return IOT_SOCKET_EINVAL;
     default:
       return IOT_SOCKET_ENOTSUP;
   }
   rc = rc_bsd_to_iot(rc);
 
   return rc;
-}
-
-// Get socket status
-int32_t iotSocketGetStatus (int32_t socket, uint32_t *status) {
-  struct fd_set read_fds, write_fds, error_fds;
-  struct timeval tv;
-  uint32_t flags;
-  int32_t  res;
-  
-  // Check parameters
-  if (status == NULL) {
-    return IOT_SOCKET_EINVAL;
-  }
-
-  FD_ZERO(&read_fds);
-  FD_ZERO(&write_fds);
-  FD_ZERO(&error_fds);
-
-  FD_SET(socket, &read_fds);
-  FD_SET(socket, &write_fds);
-  FD_SET(socket, &error_fds);
-
-  tv.tv_sec  = 0;
-  tv.tv_usec = 0;
-
-  res = select(socket + 1, &read_fds, &write_fds, &error_fds, &tv);
-  if (res < 0) {
-    return IOT_SOCKET_ERROR;
-  }
-
-  flags = 0U;
-  if (FD_ISSET(socket, &read_fds)) {
-    flags |= IOT_SOCKET_FLAG_READ;
-  }
-  if (FD_ISSET(socket, &write_fds)) {
-    flags |= IOT_SOCKET_FLAG_WRITE;
-  }
-  if (FD_ISSET(socket, &error_fds)) {
-    flags |= IOT_SOCKET_FLAG_ERROR;
-  }
-  *status = flags;
-
-  return 0;
 }
 
 // Close and release a socket
@@ -405,7 +565,7 @@ int32_t iotSocketClose (int32_t socket) {
 
 
 // Retrieve host IP address from host name
-int32_t iotSocketGetHostByName (const char *name, int32_t af, void *ip, uint32_t *ip_len) {
+int32_t iotSocketGetHostByName (const char *name, int32_t af, uint8_t *ip, uint32_t *ip_len) {
   netStatus stat;
   NET_ADDR  addr;
   int16_t   addr_type;
