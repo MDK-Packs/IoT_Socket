@@ -7,7 +7,7 @@
   <url>https://github.com/MDK-Packs/Pack/raw/master/IoT_Socket/</url>
   <license>LICENSE.txt</license>
   <releases>
-    <release version="1.1.0">
+    <release version="1.1.0" date="2019-04-02">
       Updated IoT Socket API V1.1.0
       Updated IoT Socket implementation with MDK Network
       Added IoT Socket implementation with WiFi Driver
