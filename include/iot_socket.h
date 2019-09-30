@@ -44,28 +44,58 @@ extern "C"
 
 #include <stdint.h>
 
-
-/****** Address Family definitions *****/
+/**
+ \addtogroup iotSocketAddressFamily
+@{
+*/
+/**** Address Family definitions  *****/
 #define IOT_SOCKET_AF_INET              1       ///< IPv4
 #define IOT_SOCKET_AF_INET6             2       ///< IPv6
+/**
+@}
+*/
 
-/****** Socket Type definitions *****/
+/**
+ \addtogroup iotSocketType
+@{
+*/ 
+/**** Socket Type Definitions  *****/
 #define IOT_SOCKET_SOCK_STREAM          1       ///< Stream socket
 #define IOT_SOCKET_SOCK_DGRAM           2       ///< Datagram socket
+/**
+@}
+*/
 
-/****** Socket Protocol definitions *****/
+/**
+ \addtogroup iotSocketProtocol
+@{
+*/
+/**** Socket Protocol Definitions  *****/
 #define IOT_SOCKET_IPPROTO_TCP          1       ///< TCP
 #define IOT_SOCKET_IPPROTO_UDP          2       ///< UDP
+/**
+@}
+*/
 
-/****** Socket Option definitions *****/
+/**
+ \addtogroup iotSocketOptions
+@{
+*/
+/**** Socket Options Definitions  *****/
 #define IOT_SOCKET_IO_FIONBIO           1       ///< Non-blocking I/O (Set only, default = 0); opt_val = &nbio, opt_len = sizeof(nbio), nbio (integer): 0=blocking, non-blocking otherwise
 #define IOT_SOCKET_SO_RCVTIMEO          2       ///< Receive timeout in ms (default = 0); opt_val = &timeout, opt_len = sizeof(timeout)
 #define IOT_SOCKET_SO_SNDTIMEO          3       ///< Send timeout in ms (default = 0); opt_val = &timeout, opt_len = sizeof(timeout)
 #define IOT_SOCKET_SO_KEEPALIVE         4       ///< Keep-alive messages (default = 0); opt_val = &keepalive, opt_len = sizeof(keepalive), keepalive (integer): 0=disabled, enabled otherwise
 #define IOT_SOCKET_SO_TYPE              5       ///< Socket Type (Get only); opt_val = &socket_type, opt_len = sizeof(socket_type), socket_type (integer): IOT_SOCKET_SOCK_xxx
+/**
+@}
+*/
 
-
-/****** Function return codes *****/
+/**
+ \addtogroup iotSocketReturnCodes
+@{
+*/
+/**** Socket Return Codes *****/
 #define IOT_SOCKET_ERROR                (-1)    ///< Unspecified error
 #define IOT_SOCKET_ESOCK                (-2)    ///< Invalid socket
 #define IOT_SOCKET_EINVAL               (-3)    ///< Invalid argument
@@ -82,7 +112,14 @@ extern "C"
 #define IOT_SOCKET_EALREADY             (-14)   ///< Connection already in progress
 #define IOT_SOCKET_EADDRINUSE           (-15)   ///< Address in use
 #define IOT_SOCKET_EHOSTNOTFOUND        (-16)   ///< Host not found
+/**
+@}
+*/
 
+/**
+ \addtogroup iotSocketAPI
+@{
+*/
 
 /**
   \brief         Create a communication socket.
@@ -91,11 +128,12 @@ extern "C"
   \param[in]     protocol socket protocol.
   \return        status information:
                  - Socket identification number (>=0).
-                 - IOT_SOCKET_EINVAL        = Invalid argument.
-                 - IOT_SOCKET_ENOTSUP       = Operation not supported.
-                 - IOT_SOCKET_ENOMEM        = Not enough memory.
-                 - IOT_SOCKET_ERROR         = Unspecified error.
+                 - \ref IOT_SOCKET_EINVAL        = Invalid argument.
+                 - \ref IOT_SOCKET_ENOTSUP       = Operation not supported.
+                 - \ref IOT_SOCKET_ENOMEM        = Not enough memory.
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
+ 
 extern int32_t iotSocketCreate (int32_t af, int32_t type, int32_t protocol);
 
 /**
@@ -105,11 +143,11 @@ extern int32_t iotSocketCreate (int32_t af, int32_t type, int32_t protocol);
   \param[in]     ip_len   length of 'ip' address in bytes.
   \param[in]     port     local port number.
   \return        status information:
-                 - 0                        = Operation successful.
-                 - IOT_SOCKET_ESOCK         = Invalid socket.
-                 - IOT_SOCKET_EINVAL        = Invalid argument (address or socket already bound).
-                 - IOT_SOCKET_EADDRINUSE    = Address already in use.
-                 - IOT_SOCKET_ERROR         = Unspecified error.
+                 - 0                             = Operation successful.
+                 - \ref IOT_SOCKET_ESOCK         = Invalid socket.
+                 - \ref IOT_SOCKET_EINVAL        = Invalid argument (address or socket already bound).
+                 - \ref IOT_SOCKET_EADDRINUSE    = Address already in use.
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketBind (int32_t socket, const uint8_t *ip, uint32_t ip_len, uint16_t port);
 
@@ -118,12 +156,12 @@ extern int32_t iotSocketBind (int32_t socket, const uint8_t *ip, uint32_t ip_len
   \param[in]     socket   socket identification number.
   \param[in]     backlog  number of connection requests that can be queued.
   \return        status information:
-                 - 0                        = Operation successful.
-                 - IOT_SOCKET_ESOCK         = Invalid socket.
-                 - IOT_SOCKET_EINVAL        = Invalid argument (socket not bound).
-                 - IOT_SOCKET_ENOTSUP       = Operation not supported.
-                 - IOT_SOCKET_EISCONN       = Socket is already connected.
-                 - IOT_SOCKET_ERROR         = Unspecified error.
+                 - 0                             = Operation successful.
+                 - \ref IOT_SOCKET_ESOCK         = Invalid socket.
+                 - \ref IOT_SOCKET_EINVAL        = Invalid argument (socket not bound).
+                 - \ref IOT_SOCKET_ENOTSUP       = Operation not supported.
+                 - \ref IOT_SOCKET_EISCONN       = Socket is already connected.
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketListen (int32_t socket, int32_t backlog);
 
@@ -137,13 +175,13 @@ extern int32_t iotSocketListen (int32_t socket, int32_t backlog);
   \param[out]    port     pointer to buffer where port of connecting socket shall be returned (NULL for none).
   \return        status information:
                  - socket identification number of accepted socket (>=0).
-                 - IOT_SOCKET_ESOCK         = Invalid socket.
-                 - IOT_SOCKET_EINVAL        = Invalid argument (socket not in listen mode).
-                 - IOT_SOCKET_ENOTSUP       = Operation not supported (socket type does not support accepting connections).
-                 - IOT_SOCKET_ECONNRESET    = Connection reset by the peer.
-                 - IOT_SOCKET_ECONNABORTED  = Connection aborted locally.
-                 - IOT_SOCKET_EAGAIN        = Operation would block or timed out (may be called again).
-                 - IOT_SOCKET_ERROR         = Unspecified error.
+                 - \ref IOT_SOCKET_ESOCK         = Invalid socket.
+                 - \ref IOT_SOCKET_EINVAL        = Invalid argument (socket not in listen mode).
+                 - \ref IOT_SOCKET_ENOTSUP       = Operation not supported (socket type does not support accepting connections).
+                 - \ref IOT_SOCKET_ECONNRESET    = Connection reset by the peer.
+                 - \ref IOT_SOCKET_ECONNABORTED  = Connection aborted locally.
+                 - \ref IOT_SOCKET_EAGAIN        = Operation would block or timed out (may be called again).
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketAccept (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t *port);
 
@@ -154,17 +192,17 @@ extern int32_t iotSocketAccept (int32_t socket, uint8_t *ip, uint32_t *ip_len, u
   \param[in]     ip_len   length of 'ip' address in bytes.
   \param[in]     port     remote port number.
   \return        status information:
-                 - 0                        = Operation successful.
-                 - IOT_SOCKET_ESOCK         = Invalid socket.
-                 - IOT_SOCKET_EINVAL        = Invalid argument.
-                 - IOT_SOCKET_EALREADY      = Connection already in progress.
-                 - IOT_SOCKET_EINPROGRESS   = Operation in progress.
-                 - IOT_SOCKET_EISCONN       = Socket is connected.
-                 - IOT_SOCKET_ECONNREFUSED  = Connection rejected by the peer.
-                 - IOT_SOCKET_ECONNABORTED  = Connection aborted locally.
-                 - IOT_SOCKET_EADDRINUSE    = Address already in use.
-                 - IOT_SOCKET_ETIMEDOUT     = Operation timed out.
-                 - IOT_SOCKET_ERROR         = Unspecified error.
+                 - 0                             = Operation successful.
+                 - \ref IOT_SOCKET_ESOCK         = Invalid socket.
+                 - \ref IOT_SOCKET_EINVAL        = Invalid argument.
+                 - \ref IOT_SOCKET_EALREADY      = Connection already in progress.
+                 - \ref IOT_SOCKET_EINPROGRESS   = Operation in progress.
+                 - \ref IOT_SOCKET_EISCONN       = Socket is connected.
+                 - \ref IOT_SOCKET_ECONNREFUSED  = Connection rejected by the peer.
+                 - \ref IOT_SOCKET_ECONNABORTED  = Connection aborted locally.
+                 - \ref IOT_SOCKET_EADDRINUSE    = Address already in use.
+                 - \ref IOT_SOCKET_ETIMEDOUT     = Operation timed out.
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketConnect (int32_t socket, const uint8_t *ip, uint32_t ip_len, uint16_t port);
 
@@ -175,13 +213,13 @@ extern int32_t iotSocketConnect (int32_t socket, const uint8_t *ip, uint32_t ip_
   \param[in]     len      length of buffer (in bytes).
   \return        status information:
                  - number of bytes received (>0).
-                 - IOT_SOCKET_ESOCK         = Invalid socket.
-                 - IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
-                 - IOT_SOCKET_ENOTCONN      = Socket is not connected.
-                 - IOT_SOCKET_ECONNRESET    = Connection reset by the peer.
-                 - IOT_SOCKET_ECONNABORTED  = Connection aborted locally.
-                 - IOT_SOCKET_EAGAIN        = Operation would block or timed out (may be called again).
-                 - IOT_SOCKET_ERROR         = Unspecified error.
+                 - \ref IOT_SOCKET_ESOCK         = Invalid socket.
+                 - \ref IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
+                 - \ref IOT_SOCKET_ENOTCONN      = Socket is not connected.
+                 - \ref IOT_SOCKET_ECONNRESET    = Connection reset by the peer.
+                 - \ref IOT_SOCKET_ECONNABORTED  = Connection aborted locally.
+                 - \ref IOT_SOCKET_EAGAIN        = Operation would block or timed out (may be called again).
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketRecv (int32_t socket, void *buf, uint32_t len);
 
@@ -197,13 +235,13 @@ extern int32_t iotSocketRecv (int32_t socket, void *buf, uint32_t len);
   \param[out]    port     pointer to buffer where remote source port shall be returned (NULL for none).
   \return        status information:
                  - number of bytes received (>0).
-                 - IOT_SOCKET_ESOCK         = Invalid socket.
-                 - IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
-                 - IOT_SOCKET_ENOTCONN      = Socket is not connected.
-                 - IOT_SOCKET_ECONNRESET    = Connection reset by the peer.
-                 - IOT_SOCKET_ECONNABORTED  = Connection aborted locally.
-                 - IOT_SOCKET_EAGAIN        = Operation would block or timed out (may be called again).
-                 - IOT_SOCKET_ERROR         = Unspecified error.
+                 - \ref IOT_SOCKET_ESOCK         = Invalid socket.
+                 - \ref IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
+                 - \ref IOT_SOCKET_ENOTCONN      = Socket is not connected.
+                 - \ref IOT_SOCKET_ECONNRESET    = Connection reset by the peer.
+                 - \ref IOT_SOCKET_ECONNABORTED  = Connection aborted locally.
+                 - \ref IOT_SOCKET_EAGAIN        = Operation would block or timed out (may be called again).
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketRecvFrom (int32_t socket, void *buf, uint32_t len, uint8_t *ip, uint32_t *ip_len, uint16_t *port);
 
@@ -214,13 +252,13 @@ extern int32_t iotSocketRecvFrom (int32_t socket, void *buf, uint32_t len, uint8
   \param[in]     len      length of data (in bytes).
   \return        status information:
                  - number of bytes sent (>0).
-                 - IOT_SOCKET_ESOCK         = Invalid socket.
-                 - IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
-                 - IOT_SOCKET_ENOTCONN      = Socket is not connected.
-                 - IOT_SOCKET_ECONNRESET    = Connection reset by the peer.
-                 - IOT_SOCKET_ECONNABORTED  = Connection aborted locally.
-                 - IOT_SOCKET_EAGAIN        = Operation would block or timed out (may be called again).
-                 - IOT_SOCKET_ERROR         = Unspecified error.
+                 - \ref IOT_SOCKET_ESOCK         = Invalid socket.
+                 - \ref IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
+                 - \ref IOT_SOCKET_ENOTCONN      = Socket is not connected.
+                 - \ref IOT_SOCKET_ECONNRESET    = Connection reset by the peer.
+                 - \ref IOT_SOCKET_ECONNABORTED  = Connection aborted locally.
+                 - \ref IOT_SOCKET_EAGAIN        = Operation would block or timed out (may be called again).
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketSend (int32_t socket, const void *buf, uint32_t len);
 
@@ -234,13 +272,13 @@ extern int32_t iotSocketSend (int32_t socket, const void *buf, uint32_t len);
   \param[in]     port     remote destination port number.
   \return        status information:
                  - number of bytes sent (>0).
-                 - IOT_SOCKET_ESOCK         = Invalid socket.
-                 - IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
-                 - IOT_SOCKET_ENOTCONN      = Socket is not connected.
-                 - IOT_SOCKET_ECONNRESET    = Connection reset by the peer.
-                 - IOT_SOCKET_ECONNABORTED  = Connection aborted locally.
-                 - IOT_SOCKET_EAGAIN        = Operation would block or timed out (may be called again).
-                 - IOT_SOCKET_ERROR         = Unspecified error.
+                 - \ref IOT_SOCKET_ESOCK         = Invalid socket.
+                 - \ref IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
+                 - \ref IOT_SOCKET_ENOTCONN      = Socket is not connected.
+                 - \ref IOT_SOCKET_ECONNRESET    = Connection reset by the peer.
+                 - \ref IOT_SOCKET_ECONNABORTED  = Connection aborted locally.
+                 - \ref IOT_SOCKET_EAGAIN        = Operation would block or timed out (may be called again).
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketSendTo (int32_t socket, const void *buf, uint32_t len, const uint8_t *ip, uint32_t ip_len, uint16_t port);
 
@@ -253,10 +291,10 @@ extern int32_t iotSocketSendTo (int32_t socket, const void *buf, uint32_t len, c
                  - length of stored 'ip' on output.
   \param[out]    port     pointer to buffer where local port shall be returned (NULL for none).
   \return        status information:
-                 - 0                        = Operation successful.
-                 - IOT_SOCKET_ESOCK         = Invalid socket.
-                 - IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
-                 - IOT_SOCKET_ERROR         = Unspecified error.
+                 - 0                             = Operation successful.
+                 - \ref IOT_SOCKET_ESOCK         = Invalid socket.
+                 - \ref IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketGetSockName (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t *port);
 
@@ -269,11 +307,11 @@ extern int32_t iotSocketGetSockName (int32_t socket, uint8_t *ip, uint32_t *ip_l
                  - length of stored 'ip' on output.
   \param[out]    port     pointer to buffer where remote port shall be returned (NULL for none).
   \return        status information:
-                 - 0                        = Operation successful.
-                 - IOT_SOCKET_ESOCK         = Invalid socket.
-                 - IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
-                 - IOT_SOCKET_ENOTCONN      = Socket is not connected.
-                 - IOT_SOCKET_ERROR         = Unspecified error.
+                 - 0                             = Operation successful.
+                 - \ref IOT_SOCKET_ESOCK         = Invalid socket.
+                 - \ref IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
+                 - \ref IOT_SOCKET_ENOTCONN      = Socket is not connected.
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketGetPeerName (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t *port);
 
@@ -286,11 +324,11 @@ extern int32_t iotSocketGetPeerName (int32_t socket, uint8_t *ip, uint32_t *ip_l
                  - length of buffer on input.
                  - length of data on output.
   \return        status information:
-                 - 0                        = Operation successful.
-                 - IOT_SOCKET_ESOCK         = Invalid socket.
-                 - IOT_SOCKET_EINVAL        = Invalid argument.
-                 - IOT_SOCKET_ENOTSUP       = Operation not supported.
-                 - IOT_SOCKET_ERROR         = Unspecified error.
+                 - 0                             = Operation successful.
+                 - \ref IOT_SOCKET_ESOCK         = Invalid socket.
+                 - \ref IOT_SOCKET_EINVAL        = Invalid argument.
+                 - \ref IOT_SOCKET_ENOTSUP       = Operation not supported.
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketGetOpt (int32_t socket, int32_t opt_id, void *opt_val, uint32_t *opt_len);
 
@@ -301,11 +339,11 @@ extern int32_t iotSocketGetOpt (int32_t socket, int32_t opt_id, void *opt_val, u
   \param[in]     opt_val  pointer to the option value.
   \param[in]     opt_len  length of the option value in bytes.
   \return        status information:
-                 - 0                        = Operation successful.
-                 - IOT_SOCKET_ESOCK         = Invalid socket.
-                 - IOT_SOCKET_EINVAL        = Invalid argument.
-                 - IOT_SOCKET_ENOTSUP       = Operation not supported.
-                 - IOT_SOCKET_ERROR         = Unspecified error.
+                 - 0                             = Operation successful.
+                 - \ref IOT_SOCKET_ESOCK         = Invalid socket.
+                 - \ref IOT_SOCKET_EINVAL        = Invalid argument.
+                 - \ref IOT_SOCKET_ENOTSUP       = Operation not supported.
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketSetOpt (int32_t socket, int32_t opt_id, const void *opt_val, uint32_t opt_len);
 
@@ -313,10 +351,10 @@ extern int32_t iotSocketSetOpt (int32_t socket, int32_t opt_id, const void *opt_
   \brief         Close and release a socket.
   \param[in]     socket   socket identification number.
   \return        status information:
-                 - 0                        = Operation successful.
-                 - IOT_SOCKET_ESOCK         = Invalid socket.
-                 - IOT_SOCKET_EAGAIN        = Operation would block (may be called again).
-                 - IOT_SOCKET_ERROR         = Unspecified error.
+                 - 0                             = Operation successful.
+                 - \ref IOT_SOCKET_ESOCK         = Invalid socket.
+                 - \ref IOT_SOCKET_EAGAIN        = Operation would block (may be called again).
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketClose (int32_t socket);
 
@@ -330,13 +368,17 @@ extern int32_t iotSocketClose (int32_t socket);
                  - length of stored 'ip' on output.
   \return        status information:
                  - 0                        = Operation successful.
-                 - IOT_SOCKET_EINVAL        = Invalid argument.
-                 - IOT_SOCKET_ENOTSUP       = Operation not supported.
-                 - IOT_SOCKET_ETIMEDOUT     = Operation timed out.
-                 - IOT_SOCKET_EHOSTNOTFOUND = Host not found.
-                 - IOT_SOCKET_ERROR         = Unspecified error.
+                 - \ref IOT_SOCKET_EINVAL        = Invalid argument.
+                 - \ref IOT_SOCKET_ENOTSUP       = Operation not supported.
+                 - \ref IOT_SOCKET_ETIMEDOUT     = Operation timed out.
+                 - \ref IOT_SOCKET_EHOSTNOTFOUND = Host not found.
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketGetHostByName (const char *name, int32_t af, uint8_t *ip, uint32_t *ip_len);
+
+/**
+@}
+*/
 
 #ifdef  __cplusplus
 }
