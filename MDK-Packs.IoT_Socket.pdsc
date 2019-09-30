@@ -7,6 +7,9 @@
   <url>https://github.com/MDK-Packs/Pack/raw/master/IoT_Socket/</url>
   <license>LICENSE.txt</license>
   <releases>
+    <release version="1.1.1" date="2019-09-30">
+      Added IoT Socket API documentation.
+    </release>
     <release version="1.1.0" date="2019-04-02">
       Updated IoT Socket API V1.1.0
       Updated IoT Socket implementation with MDK Network
@@ -18,8 +21,9 @@
   </releases>
   <apis>
     <api Cclass="IoT Utility" Cgroup="Socket" Capiversion="1.1.0" exclusive="1">
-      <description>Simple IP Socket interface</description>
+      <description> Simple IP Socket interface </description>
       <files>
+        <file category="doc" name="documentation/index.html"/>
         <file category="header" name="include/iot_socket.h"/>
       </files>
     </api>
