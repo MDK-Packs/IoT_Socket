@@ -33,7 +33,7 @@ doxygen IoT_Socket.dxy
 
 REM -- Copy search style sheet ---------------------
 ECHO Copy search style sheets
-copy /Y Doxygen_Templates\search.css ..\Documentation\html\search\. 
+copy /Y Doxygen_Templates\search.css ..\documentation\html\search\. 
   
 :END
   ECHO.
