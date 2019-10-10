@@ -44,57 +44,25 @@ extern "C"
 
 #include <stdint.h>
 
-/**
- \addtogroup iotSocketAddressFamily
-@{
-*/
 /**** Address Family definitions  *****/
 #define IOT_SOCKET_AF_INET              1       ///< IPv4
 #define IOT_SOCKET_AF_INET6             2       ///< IPv6
-/**
-@}
-*/
 
-/**
- \addtogroup iotSocketType
-@{
-*/ 
-/**** Socket Type Definitions  *****/
+/**** Socket Type definitions  *****/
 #define IOT_SOCKET_SOCK_STREAM          1       ///< Stream socket
 #define IOT_SOCKET_SOCK_DGRAM           2       ///< Datagram socket
-/**
-@}
-*/
 
-/**
- \addtogroup iotSocketProtocol
-@{
-*/
-/**** Socket Protocol Definitions  *****/
+/**** Socket Protocol definitions  *****/
 #define IOT_SOCKET_IPPROTO_TCP          1       ///< TCP
 #define IOT_SOCKET_IPPROTO_UDP          2       ///< UDP
-/**
-@}
-*/
 
-/**
- \addtogroup iotSocketOptions
-@{
-*/
-/**** Socket Options Definitions  *****/
+/**** Socket Option definitions  *****/
 #define IOT_SOCKET_IO_FIONBIO           1       ///< Non-blocking I/O (Set only, default = 0); opt_val = &nbio, opt_len = sizeof(nbio), nbio (integer): 0=blocking, non-blocking otherwise
 #define IOT_SOCKET_SO_RCVTIMEO          2       ///< Receive timeout in ms (default = 0); opt_val = &timeout, opt_len = sizeof(timeout)
 #define IOT_SOCKET_SO_SNDTIMEO          3       ///< Send timeout in ms (default = 0); opt_val = &timeout, opt_len = sizeof(timeout)
 #define IOT_SOCKET_SO_KEEPALIVE         4       ///< Keep-alive messages (default = 0); opt_val = &keepalive, opt_len = sizeof(keepalive), keepalive (integer): 0=disabled, enabled otherwise
 #define IOT_SOCKET_SO_TYPE              5       ///< Socket Type (Get only); opt_val = &socket_type, opt_len = sizeof(socket_type), socket_type (integer): IOT_SOCKET_SOCK_xxx
-/**
-@}
-*/
 
-/**
- \addtogroup iotSocketReturnCodes
-@{
-*/
 /**** Socket Return Codes *****/
 #define IOT_SOCKET_ERROR                (-1)    ///< Unspecified error
 #define IOT_SOCKET_ESOCK                (-2)    ///< Invalid socket
@@ -112,14 +80,7 @@ extern "C"
 #define IOT_SOCKET_EALREADY             (-14)   ///< Connection already in progress
 #define IOT_SOCKET_EADDRINUSE           (-15)   ///< Address in use
 #define IOT_SOCKET_EHOSTNOTFOUND        (-16)   ///< Host not found
-/**
-@}
-*/
 
-/**
- \addtogroup iotSocketAPI
-@{
-*/
 
 /**
   \brief         Create a communication socket.
@@ -133,7 +94,6 @@ extern "C"
                  - \ref IOT_SOCKET_ENOMEM        = Not enough memory.
                  - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
- 
 extern int32_t iotSocketCreate (int32_t af, int32_t type, int32_t protocol);
 
 /**
@@ -375,10 +335,6 @@ extern int32_t iotSocketClose (int32_t socket);
                  - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketGetHostByName (const char *name, int32_t af, uint8_t *ip, uint32_t *ip_len);
-
-/**
-@}
-*/
 
 #ifdef  __cplusplus
 }

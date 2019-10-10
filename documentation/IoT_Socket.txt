@@ -17,24 +17,24 @@ wireless IP connections.
 Directory Structure
 ======================
 
-| Directory          | Content                                                   |                
-|:-------------------|:--------------------------------------------------------- |
+| Directory          | Content                                             |
+|:-------------------|:--------------------------------------------------- |
+| documentation      | IoT Socket pack documentation                       |
 | include            | Header file with the IoT Socket API                 |
 | source             | Source files                                        |
 | source/mdk_network | Implementation for the MDK-Middleware network stack |
 | source/wifi        | Implementation for a WiFi CMSIS-Driver              |
-| documentation      | IoT Socket pack documentation                       |
 
 
 Related GitHub repositories
 ======================
 
-| Repository                  | Description                                               |                
+| Repository                  | Description                                               |
 |:--------------------------- |:--------------------------------------------------------- |
-| [CMSIS](https://github.com/ARM-software/cmsis_5)    |  CMSIS  |
-| [CMSIS-FreeRTOS](https://github.com/arm-software/CMSIS-FreeRTOS)            | CMSIS-RTOS adoption of FreeRTOS                                                      |
-| [CMSIS-Driver](https://github.com/arm-software/CMSIS-Driver)                | Generic MCU driver implementations and templates for Ethernet MAC/PHY and Flash.  |
-| [mdk-packs](https://github.com/mdk-packs)                                   | IoT cloud connectors as trail implementations for MDK (help us to make it generic)|
+| [CMSIS](https://github.com/ARM-software/cmsis_5)                 | CMSIS                                                                             |
+| [CMSIS-FreeRTOS](https://github.com/arm-software/CMSIS-FreeRTOS) | CMSIS-RTOS adoption of FreeRTOS                                                   |
+| [CMSIS-Driver](https://github.com/arm-software/CMSIS-Driver)     | Generic MCU driver implementations and templates for Ethernet MAC/PHY and Flash   |
+| [MDK-Packs](https://github.com/mdk-packs)                        | IoT cloud connectors as trail implementations for MDK (help us to make it generic)|
 
 License
 ======================
@@ -42,6 +42,108 @@ Provided under [Apache 2.0](https://opensource.org/licenses/Apache-2.0) license.
 
 */
 
+
+/**
+\defgroup iotSocketMacros IoT Socket Macros
+\brief List of IoT Socket macros
+\details
+*/
+
+/**
+\addtogroup iotSocketMacros
+@{
+*/
+
+/**
+\defgroup iotSocketAddressFamily  IoT Socket Address Family
+\brief Address Family definitions.
+\details The Socket Address Family specifies the addressing scheme that an instance of the socket can use.
+@{
+\def IOT_SOCKET_AF_INET
+\details Internet Address Family version 4.
+\def IOT_SOCKET_AF_INET6
+\details Internet Address Family version 6.
+@}
+*/
+
+/**
+\defgroup iotSocketType  IoT Socket Type
+\brief Socket Type definitions.
+\details The Socket Type specifies the type of the socket.
+@{
+\def IOT_SOCKET_SOCK_STREAM
+\details Stream Socket is connection-oriented, sequenced and reliable, implemented on top of the TCP protocol.
+\def IOT_SOCKET_SOCK_DGRAM
+\details Datagram Socket is connectionless, unreliable, using the UDP protocol.
+@}
+*/
+
+/**
+\defgroup iotSocketProtocol  IoT Socket Protocol
+\brief Socket Protocol definitions.
+\details The Socket Protocol specifies the Internet Protocol Type that the socket is using.
+@{
+\def IOT_SOCKET_IPPROTO_TCP
+\details Transmission Control Protocol.
+\def IOT_SOCKET_IPPROTO_UDP
+\details User Datagram Protocol.
+@}
+*/
+
+/**
+\defgroup iotSocketOptions  IoT Socket Options
+\brief Socket Option definitions.
+\details The Socket Option specifies the socket option for which the value is to be set or obtained.
+@{
+\def IOT_SOCKET_IO_FIONBIO
+\details Enables or disables the non-blocking mode for the socket.
+\def IOT_SOCKET_SO_RCVTIMEO
+\details Specifies the time limit for receiving in blocking mode. The time limit is in milliseconds.
+\def IOT_SOCKET_SO_SNDTIMEO
+\details Specifies the time limit for sending in blocking mode. The time limit is in milliseconds.
+\def IOT_SOCKET_SO_KEEPALIVE
+\details Enables or disables the keep-alive mode for the stream socket.
+\def IOT_SOCKET_SO_TYPE
+\details Obtains the type of the socket.
+@}
+*/
+
+/**
+\defgroup iotSocketReturnCodes  IoT Socket Return Codes
+\brief Socket Return Codes.
+\details This section lists all the return errors the socket functions will return.
+The error codes are negative. This makes it easy to check an error when the return
+code is less than \token{0}.
+@{
+\def IOT_SOCKET_ERROR
+\def IOT_SOCKET_ESOCK
+\def IOT_SOCKET_EINVAL
+\def IOT_SOCKET_ENOTSUP
+\def IOT_SOCKET_ENOMEM
+\def IOT_SOCKET_EAGAIN
+\def IOT_SOCKET_EINPROGRESS
+\def IOT_SOCKET_ETIMEDOUT
+\def IOT_SOCKET_EISCONN
+\def IOT_SOCKET_ENOTCONN
+\def IOT_SOCKET_ECONNREFUSED
+\def IOT_SOCKET_ECONNRESET
+\def IOT_SOCKET_ECONNABORTED
+\def IOT_SOCKET_EALREADY
+\def IOT_SOCKET_EADDRINUSE
+\def IOT_SOCKET_EHOSTNOTFOUND
+@}
+*/
+
+/**
+@}
+*/
+
+
+/**
+\defgroup iotSocketAPI  IoT Socket API Functions
+\brief List of IoT Socket API functions
+@{
+*/
 
 /*==================   API description details ========================*/
 
@@ -128,7 +230,7 @@ void Echo_Server_Thread (void *arg) {
         break;                                      // Error occurred
       }
       if (res > 0) {
-        iotSocketSend (sock, dbuf, res);         // Echo the data
+        iotSocketSend (sock, dbuf, res);            // Echo the data
       }    
     }
     iotSocketClose (sock);
@@ -136,7 +238,6 @@ void Echo_Server_Thread (void *arg) {
 }
 \endcode
 */
-
 
 /**
 \fn int32_t iotSocketAccept (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t *port)
@@ -230,7 +331,6 @@ void Echo_Client_Thread (void *arg) {
 }
 \endcode
 */
-
 
 /**
 \fn int32_t iotSocketRecv (int32_t socket, void *buf, uint32_t len)
@@ -563,3 +663,6 @@ space pointed to by \em ip. On return it contains the actual length of the addre
 
 */
 
+/**
+@}
+*/

@@ -21,9 +21,7 @@ REM -- Delete previous generated HTML files ---------------------
   ECHO Delete previous generated HTML files
 
 REM -- Remove generated doxygen files ---------------------
-PUSHD ..\documentation
 IF EXIST .\html (RMDIR /S /Q .\html)
-POPD
 
 REM -- Generate New HTML Files ---------------------
   ECHO.
@@ -33,8 +31,8 @@ doxygen IoT_Socket.dxy
 
 REM -- Copy search style sheet ---------------------
 ECHO Copy search style sheets
-copy /Y Doxygen_Templates\search.css ..\documentation\html\search\. 
-  
+copy /Y Doxygen_Templates\search.css html\search\
+
 :END
   ECHO.
 REM done
