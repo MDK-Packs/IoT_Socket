@@ -7,6 +7,9 @@
   <url>https://github.com/MDK-Packs/Pack/raw/master/IoT_Socket/</url>
   <license>LICENSE.txt</license>
   <releases>
+    <release version="1.2.0">
+      Updated IoT Socket API V1.2.0 (support for polling Socket Receive/Send)
+    </release>
     <release version="1.1.1">
       Added IoT Socket API documentation
     </release>
@@ -20,7 +23,7 @@
     </release>
   </releases>
   <apis>
-    <api Cclass="IoT Utility" Cgroup="Socket" Capiversion="1.1.0" exclusive="1">
+    <api Cclass="IoT Utility" Cgroup="Socket" Capiversion="1.2.0" exclusive="1">
       <description>Simple IP Socket interface</description>
       <files>
         <file category="doc"    name="documentation/index.html"/>
@@ -51,7 +54,7 @@
     </condition>
     <condition id="WiFi Driver Socket">
       <description>WiFi Driver Socket</description>
-      <require Cclass="CMSIS Driver" Cgroup="WiFi"/>
+      <require Cclass="CMSIS Driver" Cgroup="WiFi" Capiversion="1.1.0"/>
     </condition>
   </conditions>
   <components>
@@ -66,7 +69,7 @@
         <file category="source"  name="source/mdk_network/iot_socket.c"/>
       </files>
     </component>
-    <component Cclass="IoT Utility" Cgroup="Socket" Csub="WiFi" Capiversion="1.1.0" Cversion="1.0.0" condition="WiFi Driver Socket">
+    <component Cclass="IoT Utility" Cgroup="Socket" Csub="WiFi" Capiversion="1.2.0" Cversion="1.0.0" condition="WiFi Driver Socket">
       <description>IoT Socket implementation with WiFi Driver</description>
       <RTE_Components_h>
         <!-- the following content goes into file 'RTE_Components.h' -->
