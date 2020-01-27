@@ -21,6 +21,16 @@
 #include "rl_net.h"
 #include "RTE_Components.h"
 
+// Import number of available BSD sockets
+#include "Net_Config_BSD.h"
+
+// Socket attributes
+struct {
+  uint32_t ionbio  : 1;
+  uint32_t tv_sec  : 21;
+  uint32_t tv_msec : 10;
+} sock_attr[BSD_NUM_SOCKS];
+
 // Convert return codes from BSD to IoT
 static int32_t rc_bsd_to_iot (int32_t bsd_rc) {
   int32_t iot_rc;
@@ -121,7 +131,10 @@ int32_t iotSocketCreate (int32_t af, int32_t type, int32_t protocol) {
   }
 
   rc = socket(af, type, protocol);
-  if (rc < 0) {
+  if (rc > 0) {
+    memset (&sock_attr[rc-1], 0, sizeof(sock_attr[0]));
+  }
+  else {
     rc = rc_bsd_to_iot(rc);
   }
 
@@ -256,9 +269,41 @@ int32_t iotSocketConnect (int32_t socket, const uint8_t *ip, uint32_t ip_len, ui
   return rc;
 }
 
+// Check if socket is readable
+static int32_t socket_check_read (int32_t socket) {
+  timeval tv, *ptv;
+  fd_set  fds;
+  int32_t nr;
+
+  if (socket <= 0 || socket > BSD_NUM_SOCKS) {
+    return IOT_SOCKET_ESOCK;
+  }
+
+  FD_ZERO(&fds);
+  FD_SET(socket, &fds);
+  ptv = &tv;
+  memset (&tv, 0, sizeof(tv));
+  if (!sock_attr[socket-1].ionbio) {
+    tv.tv_sec  = sock_attr[socket-1].tv_sec;
+    tv.tv_usec = sock_attr[socket-1].tv_msec * 1000;
+    if ((tv.tv_sec == 0U) && (tv.tv_usec == 0U)) {
+      ptv = NULL;
+    }
+  }
+  nr = select (socket+1, &fds, NULL, NULL, ptv);
+  if (nr == 0) {
+    return IOT_SOCKET_EAGAIN;
+  }
+  return 0;
+}
+
 // Receive data on a connected socket
 int32_t iotSocketRecv (int32_t socket, void *buf, uint32_t len) {
   int32_t rc;
+
+  if (len == 0U) {
+    return socket_check_read (socket);
+  }
 
   rc = recv(socket, buf, (int)len, 0);
   if (rc < 0) {
@@ -277,6 +322,10 @@ int32_t iotSocketRecvFrom (int32_t socket, void *buf, uint32_t len, uint8_t *ip,
   SOCKADDR_STORAGE addr;
   int32_t addr_len = sizeof(addr);
   int32_t rc;
+
+  if (len == 0U) {
+    return socket_check_read (socket);
+  }
 
   rc = recvfrom(socket, buf, (int)len, 0, (SOCKADDR *)&addr, &addr_len);
   if (rc < 0) {
@@ -317,9 +366,31 @@ int32_t iotSocketRecvFrom (int32_t socket, void *buf, uint32_t len, uint8_t *ip,
   return rc;
 }
 
+// Check if socket is writable
+static int32_t socket_check_write (int32_t socket) {
+  fd_set fds;
+  int32_t nr;
+
+  if (socket <= 0 || socket > BSD_NUM_SOCKS) {
+    return IOT_SOCKET_ESOCK;
+  }
+
+  FD_ZERO(&fds);
+  FD_SET(socket, &fds);
+  nr = select (socket+1, NULL, &fds, NULL, NULL);
+  if (nr == 0) {
+    return IOT_SOCKET_ERROR;
+  }
+  return 0;
+}
+
 // Send data on a connected socket
 int32_t iotSocketSend (int32_t socket, const void *buf, uint32_t len) {
   int32_t rc;
+
+  if (len == 0U) {
+    return socket_check_write (socket);
+  }
 
   rc = send(socket, buf, (int)len, 0);
   if (rc < 0) {
@@ -338,6 +409,10 @@ int32_t iotSocketSendTo (int32_t socket, const void *buf, uint32_t len, const ui
   SOCKADDR_STORAGE addr;
   int32_t addr_len;
   int32_t rc;
+
+  if (len == 0U) {
+    return socket_check_write (socket);
+  }
 
   if (ip != NULL) {
     // Construct remote host address
@@ -508,9 +583,16 @@ int32_t iotSocketSetOpt (int32_t socket, int32_t opt_id, const void *opt_val, ui
         return IOT_SOCKET_EINVAL;
       }
       rc = ioctlsocket(socket, FIONBIO, (unsigned long *)&opt_val);
+      if (rc == 0) {
+        sock_attr[socket-1].ionbio = *(uint32_t *)opt_val ? 1 : 0;
+      }
       break;
     case IOT_SOCKET_SO_RCVTIMEO:
       rc = setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO,  (const char *)opt_val, (int)opt_len);
+      if (rc == 0) {
+        sock_attr[socket-1].tv_sec  = *(uint32_t *)opt_val / 1000U;
+        sock_attr[socket-1].tv_msec = *(uint32_t *)opt_val % 1000U;
+      }
       break;
     case IOT_SOCKET_SO_SNDTIMEO:
       rc = setsockopt(socket, SOL_SOCKET, SO_SNDTIMEO,  (const char *)opt_val, (int)opt_len);
@@ -533,6 +615,9 @@ int32_t iotSocketClose (int32_t socket) {
   int32_t rc;
 
   rc = closesocket(socket);
+  if (rc == 0) {
+    memset (&sock_attr[socket-1], 0, sizeof(sock_attr[0]));
+  }
   rc = rc_bsd_to_iot(rc);
 
   return rc;

@@ -9,6 +9,7 @@
   <releases>
     <release version="1.2.0">
       Updated IoT Socket API V1.2.0 (support for polling Socket Receive/Send)
+      Updated IoT Socket implementation with MDK Network
     </release>
     <release version="1.1.1">
       Added IoT Socket API documentation
@@ -58,7 +59,7 @@
     </condition>
   </conditions>
   <components>
-    <component Cclass="IoT Utility" Cgroup="Socket" Csub="MDK Network" Capiversion="1.1.0" Cversion="1.1.0" condition="MDK Network Socket">
+    <component Cclass="IoT Utility" Cgroup="Socket" Csub="MDK Network" Capiversion="1.2.0" Cversion="1.2.0" condition="MDK Network Socket">
       <description>IoT Socket implementation with MDK::Network</description>
       <RTE_Components_h>
         <!-- the following content goes into file 'RTE_Components.h' -->
