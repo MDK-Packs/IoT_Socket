@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019 Arm Limited. All rights reserved.
+ * Copyright (c) 2018-2020 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -130,11 +130,7 @@ int32_t iotSocketCreate (int32_t af, int32_t type, int32_t protocol) {
 
 // Assign a local address to a socket
 int32_t iotSocketBind (int32_t socket, const uint8_t *ip, uint32_t ip_len, uint16_t port) {
-#if defined(RTE_Network_IPv6)
-  SOCKADDR_IN6 addr;
-#else
-  SOCKADDR_IN  addr;
-#endif
+  SOCKADDR_STORAGE addr;
   int32_t addr_len;
   int32_t rc;
 
@@ -145,19 +141,21 @@ int32_t iotSocketBind (int32_t socket, const uint8_t *ip, uint32_t ip_len, uint1
 
   // Construct local address
   switch (ip_len) {
-    case NET_ADDR_IP4_LEN:
-      ((SOCKADDR *)&addr)->sa_family = AF_INET;
-      memcpy(&(((SOCKADDR_IN *)&addr)->sin_addr), ip, NET_ADDR_IP4_LEN);
-      ((SOCKADDR_IN *)&addr)->sin_port = htons(port);
-      addr_len = sizeof(SOCKADDR_IN);
-      break;
+    case NET_ADDR_IP4_LEN: {
+      SOCKADDR_IN *sa = (SOCKADDR_IN *)&addr;
+      sa->sin_family = AF_INET;
+      memcpy(&sa->sin_addr, ip, NET_ADDR_IP4_LEN);
+      sa->sin_port = htons(port);
+      addr_len     = sizeof(SOCKADDR_IN);
+    } break;
 #if defined(RTE_Network_IPv6)
-    case NET_ADDR_IP6_LEN:
-      ((SOCKADDR *)&addr)->sa_family = AF_INET6;
-      memcpy(&(((SOCKADDR_IN6 *)&addr)->sin6_addr), ip, NET_ADDR_IP6_LEN);
-      ((SOCKADDR_IN6 *)&addr)->sin6_port = htons(port);
-      addr_len = sizeof(SOCKADDR_IN6);
-      break;
+    case NET_ADDR_IP6_LEN: {
+      SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
+      sa->sin6_family = AF_INET6;
+      memcpy(&sa->sin6_addr, ip, NET_ADDR_IP6_LEN);
+      sa->sin6_port = htons(port);
+      addr_len      = sizeof(SOCKADDR_IN6);
+    } break;
 #endif
     default:
       return IOT_SOCKET_EINVAL;
@@ -181,11 +179,7 @@ int32_t iotSocketListen (int32_t socket, int32_t backlog) {
 
 // Accept a new connection on a socket
 int32_t iotSocketAccept (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t *port) {
-#if defined(RTE_Network_IPv6)
-  SOCKADDR_IN6 addr;
-#else
-  SOCKADDR_IN  addr;
-#endif
+  SOCKADDR_STORAGE addr;
   int32_t addr_len = sizeof(addr);
   int32_t rc;
 
@@ -195,30 +189,29 @@ int32_t iotSocketAccept (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t
     return rc;
   }
 
-  // Copy remote IP address
+  // Copy remote IP address and port
   if ((ip != NULL) && (ip_len != NULL)) {
-    if (((SOCKADDR *)&addr)->sa_family == AF_INET) {
-      if (*ip_len >= sizeof(((SOCKADDR_IN *)&addr)->sin_addr)) {
-        memcpy(ip, &(((SOCKADDR_IN *)&addr)->sin_addr), sizeof(((SOCKADDR_IN *)&addr)->sin_addr));
-        *ip_len = sizeof(((SOCKADDR_IN *)&addr)->sin_addr);
+    if (addr.ss_family == AF_INET) {
+      SOCKADDR_IN *sa = (SOCKADDR_IN *)&addr;
+      if (*ip_len >= sizeof(sa->sin_addr)) {
+        memcpy(ip, &sa->sin_addr, sizeof(sa->sin_addr));
+        *ip_len = sizeof(sa->sin_addr);
+      }
+      if (port != NULL) {
+        *port   = ntohs (sa->sin_port);
       }
     }
 #if defined(RTE_Network_IPv6)
-    else if (((SOCKADDR *)&addr)->sa_family == AF_INET6) {
-      if (*ip_len >= sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr)) {
-        memcpy(ip, &(((SOCKADDR_IN6 *)&addr)->sin6_addr), sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr));
-        *ip_len = sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr);
+    else if (addr.ss_family == AF_INET6) {
+      SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
+      if (*ip_len >= sizeof(sa->sin6_addr)) {
+        memcpy(ip, &sa->sin6_addr, sizeof(sa->sin6_addr));
+        *ip_len = sizeof(sa->sin6_addr);
+      }
+      if (port != NULL) {
+        *port   = ntohs (sa->sin6_port);
       }
     }
-#endif
-  }
-
-  // Copy remote port number
-  if (port != NULL) {
-#if defined(RTE_Network_IPv6)
-    *port = ntohs(addr.sin6_port);
-#else
-    *port = ntohs(addr.sin_port);
 #endif
   }
 
@@ -227,11 +220,7 @@ int32_t iotSocketAccept (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t
 
 // Connect a socket to a remote host
 int32_t iotSocketConnect (int32_t socket, const uint8_t *ip, uint32_t ip_len, uint16_t port) {
-#if defined(RTE_Network_IPv6)
-  SOCKADDR_IN6 addr;
-#else
-  SOCKADDR_IN  addr;
-#endif
+  SOCKADDR_STORAGE addr;
   int32_t addr_len;
   int32_t rc;
 
@@ -242,19 +231,20 @@ int32_t iotSocketConnect (int32_t socket, const uint8_t *ip, uint32_t ip_len, ui
 
   // Construct remote host address
   switch (ip_len) {
-    case NET_ADDR_IP4_LEN:
-      ((SOCKADDR *)&addr)->sa_family = AF_INET;
-      memcpy(&(((SOCKADDR_IN *)&addr)->sin_addr), ip, NET_ADDR_IP4_LEN);
-      ((SOCKADDR_IN *)&addr)->sin_port = htons(port);
-      addr_len = sizeof(SOCKADDR_IN);
-      break;
+    case NET_ADDR_IP4_LEN: {
+      SOCKADDR_IN *sa = (SOCKADDR_IN *)&addr;
+      memcpy(&sa->sin_addr, ip, NET_ADDR_IP4_LEN);
+      sa->sin_port = htons(port);
+      addr_len     = sizeof(SOCKADDR_IN);
+    } break;
 #if defined(RTE_Network_IPv6)
-    case NET_ADDR_IP6_LEN:
-      ((SOCKADDR *)&addr)->sa_family = AF_INET6;
-      memcpy(&(((SOCKADDR_IN6 *)&addr)->sin6_addr), ip, NET_ADDR_IP6_LEN);
-      ((SOCKADDR_IN6 *)&addr)->sin6_port = htons(port);
-      addr_len = sizeof(SOCKADDR_IN6);
-      break;
+    case NET_ADDR_IP6_LEN: {
+      SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
+      sa->sin6_family = AF_INET6;
+      memcpy(&sa->sin6_addr, ip, NET_ADDR_IP6_LEN);
+      sa->sin6_port = htons(port);
+      addr_len      = sizeof(SOCKADDR_IN6);
+    } break;
 #endif
     default:
       return IOT_SOCKET_EINVAL;
@@ -284,11 +274,7 @@ int32_t iotSocketRecv (int32_t socket, void *buf, uint32_t len) {
 
 // Receive data on a socket
 int32_t iotSocketRecvFrom (int32_t socket, void *buf, uint32_t len, uint8_t *ip, uint32_t *ip_len, uint16_t *port) {
-#if defined(RTE_Network_IPv6)
-  SOCKADDR_IN6 addr;
-#else
-  SOCKADDR_IN  addr;
-#endif
+  SOCKADDR_STORAGE addr;
   int32_t addr_len = sizeof(addr);
   int32_t rc;
 
@@ -302,30 +288,29 @@ int32_t iotSocketRecvFrom (int32_t socket, void *buf, uint32_t len, uint8_t *ip,
     return rc;
   }
 
-  // Copy remote IP address
+  // Copy remote IP address and port
   if ((ip != NULL) && (ip_len != NULL)) {
-    if (((SOCKADDR *)&addr)->sa_family == AF_INET) {
-      if (*ip_len >= sizeof(((SOCKADDR_IN *)&addr)->sin_addr)) {
-        memcpy(ip, &(((SOCKADDR_IN *)&addr)->sin_addr), sizeof(((SOCKADDR_IN *)&addr)->sin_addr));
-        *ip_len = sizeof(((SOCKADDR_IN *)&addr)->sin_addr);
+    if (addr.ss_family == AF_INET) {
+      SOCKADDR_IN *sa = (SOCKADDR_IN *)&addr;
+      if (*ip_len >= sizeof(sa->sin_addr)) {
+        memcpy(ip, &sa->sin_addr, sizeof(sa->sin_addr));
+        *ip_len = sizeof(sa->sin_addr);
+      }
+      if (port != NULL) {
+        *port   = ntohs (sa->sin_port);
       }
     }
 #if defined(RTE_Network_IPv6)
-    else if (((SOCKADDR *)&addr)->sa_family == AF_INET6) {
-      if (*ip_len >= sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr)) {
-        memcpy(ip, &(((SOCKADDR_IN6 *)&addr)->sin6_addr), sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr));
-        *ip_len = sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr);
+    else if (addr.ss_family == AF_INET6) {
+      SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
+      if (*ip_len >= sizeof(sa->sin6_addr)) {
+        memcpy(ip, &sa->sin6_addr, sizeof(sa->sin6_addr));
+        *ip_len = sizeof(sa->sin6_addr);
+      }
+      if (port != NULL) {
+        *port   = ntohs (sa->sin6_port);
       }
     }
-#endif
-  }
-
-  // Copy remote port number
-  if (port != NULL) {
-#if defined(RTE_Network_IPv6)
-    *port = ntohs(addr.sin6_port);
-#else
-    *port = ntohs(addr.sin_port);
 #endif
   }
 
@@ -350,30 +335,28 @@ int32_t iotSocketSend (int32_t socket, const void *buf, uint32_t len) {
 
 // Send data on a socket
 int32_t iotSocketSendTo (int32_t socket, const void *buf, uint32_t len, const uint8_t *ip, uint32_t ip_len, uint16_t port) {
-#if defined(RTE_Network_IPv6)
-  SOCKADDR_IN6 addr;
-#else
-  SOCKADDR_IN  addr;
-#endif
+  SOCKADDR_STORAGE addr;
   int32_t addr_len;
   int32_t rc;
 
   if (ip != NULL) {
     // Construct remote host address
     switch (ip_len) {
-      case NET_ADDR_IP4_LEN:
-        ((SOCKADDR *)&addr)->sa_family = AF_INET;
-        memcpy(&(((SOCKADDR_IN *)&addr)->sin_addr), ip, NET_ADDR_IP4_LEN);
-        ((SOCKADDR_IN *)&addr)->sin_port = htons(port);
-        addr_len = sizeof(SOCKADDR_IN);
-        break;
+      case NET_ADDR_IP4_LEN: {
+        SOCKADDR_IN *sa = (SOCKADDR_IN *)&addr;
+        sa->sin_family = AF_INET;
+        memcpy(&sa->sin_addr, ip, NET_ADDR_IP4_LEN);
+        sa->sin_port = htons(port);
+        addr_len     = sizeof(SOCKADDR_IN);
+      } break;
 #if defined(RTE_Network_IPv6)
-      case NET_ADDR_IP6_LEN:
-        ((SOCKADDR *)&addr)->sa_family = AF_INET6;
-        memcpy(&(((SOCKADDR_IN6 *)&addr)->sin6_addr), ip, NET_ADDR_IP6_LEN);
-        ((SOCKADDR_IN6 *)&addr)->sin6_port = htons(port);
-        addr_len = sizeof(SOCKADDR_IN6);
-        break;
+      case NET_ADDR_IP6_LEN: {
+        SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
+        sa->sin6_family = AF_INET6;
+        memcpy(&sa->sin6_addr, ip, NET_ADDR_IP6_LEN);
+        sa->sin6_port = htons(port);
+        addr_len      = sizeof(SOCKADDR_IN6);
+      } break;
 #endif
       default:
         return IOT_SOCKET_EINVAL;
@@ -396,11 +379,7 @@ int32_t iotSocketSendTo (int32_t socket, const void *buf, uint32_t len, const ui
 
 // Retrieve local IP address and port of a socket
 int32_t iotSocketGetSockName (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t *port) {
-#if defined(RTE_Network_IPv6)
-  SOCKADDR_IN6 addr;
-#else
-  SOCKADDR_IN  addr;
-#endif
+  SOCKADDR_STORAGE addr;
   int32_t addr_len = sizeof(addr);
   int32_t rc;
 
@@ -412,34 +391,34 @@ int32_t iotSocketGetSockName (int32_t socket, uint8_t *ip, uint32_t *ip_len, uin
 
   rc = IOT_SOCKET_EINVAL;
 
-  // Copy local IP address
+  // Copy local IP address and port
   if ((ip != NULL) && (ip_len != NULL)) {
-    if (((SOCKADDR *)&addr)->sa_family == AF_INET) {
-      if (*ip_len >= sizeof(((SOCKADDR_IN *)&addr)->sin_addr)) {
-        memcpy(ip, &(((SOCKADDR_IN *)&addr)->sin_addr), sizeof(((SOCKADDR_IN *)&addr)->sin_addr));
-        *ip_len = sizeof(((SOCKADDR_IN *)&addr)->sin_addr);
+    if (addr.ss_family == AF_INET) {
+      SOCKADDR_IN *sa = (SOCKADDR_IN *)&addr;
+      if (*ip_len >= sizeof(sa->sin_addr)) {
+        memcpy(ip, &sa->sin_addr, sizeof(sa->sin_addr));
+        *ip_len = sizeof(sa->sin_addr);
+        rc = 0;
+      }
+      if (port != NULL) {
+        *port   = ntohs (sa->sin_port);
         rc = 0;
       }
     }
 #if defined(RTE_Network_IPv6)
-    else if (((SOCKADDR *)&addr)->sa_family == AF_INET6) {
-      if (*ip_len >= sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr)) {
-        memcpy(ip, &(((SOCKADDR_IN6 *)&addr)->sin6_addr), sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr));
-        *ip_len = sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr);
+    else if (addr.ss_family == AF_INET6) {
+      SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
+      if (*ip_len >= sizeof(sa->sin6_addr)) {
+        memcpy(ip, &sa->sin6_addr, sizeof(sa->sin6_addr));
+        *ip_len = sizeof(sa->sin6_addr);
+        rc = 0;
+      }
+      if (port != NULL) {
+        *port   = ntohs (sa->sin6_port);
         rc = 0;
       }
     }
 #endif
-  }
-
-  // Copy local port number
-  if (port != NULL) {
-#if defined(RTE_Network_IPv6)
-    *port = ntohs(addr.sin6_port);
-#else
-    *port = ntohs(addr.sin_port);
-#endif
-    rc = 0;
   }
 
   return rc;
@@ -447,11 +426,7 @@ int32_t iotSocketGetSockName (int32_t socket, uint8_t *ip, uint32_t *ip_len, uin
 
 // Retrieve remote IP address and port of a socket
 int32_t iotSocketGetPeerName (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t *port) {
-#if defined(RTE_Network_IPv6)
-  SOCKADDR_IN6 addr;
-#else
-  SOCKADDR_IN  addr;
-#endif
+  SOCKADDR_STORAGE addr;
   int32_t addr_len = sizeof(addr);
   int32_t rc;
 
@@ -463,34 +438,34 @@ int32_t iotSocketGetPeerName (int32_t socket, uint8_t *ip, uint32_t *ip_len, uin
 
   rc = IOT_SOCKET_EINVAL;
 
-  // Copy remote IP address
+  // Copy remote IP address and port
   if ((ip != NULL) && (ip_len != NULL)) {
-    if (((SOCKADDR *)&addr)->sa_family == AF_INET) {
-      if (*ip_len >= sizeof(((SOCKADDR_IN *)&addr)->sin_addr)) {
-        memcpy(ip, &(((SOCKADDR_IN *)&addr)->sin_addr), sizeof(((SOCKADDR_IN *)&addr)->sin_addr));
-        *ip_len = sizeof(((SOCKADDR_IN *)&addr)->sin_addr);
+    if (addr.ss_family == AF_INET) {
+      SOCKADDR_IN *sa = (SOCKADDR_IN *)&addr;
+      if (*ip_len >= sizeof(sa->sin_addr)) {
+        memcpy(ip, &sa->sin_addr, sizeof(sa->sin_addr));
+        *ip_len = sizeof(sa->sin_addr);
+        rc = 0;
+      }
+      if (port != NULL) {
+        *port   = ntohs (sa->sin_port);
         rc = 0;
       }
     }
 #if defined(RTE_Network_IPv6)
-    else if (((SOCKADDR *)&addr)->sa_family == AF_INET6) {
-      if (*ip_len >= sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr)) {
-        memcpy(ip, &(((SOCKADDR_IN6 *)&addr)->sin6_addr), sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr));
-        *ip_len = sizeof(((SOCKADDR_IN6 *)&addr)->sin6_addr);
+    else if (addr.ss_family == AF_INET6) {
+      SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
+      if (*ip_len >= sizeof(sa->sin6_addr)) {
+        memcpy(ip, &sa->sin6_addr, sizeof(sa->sin6_addr));
+        *ip_len = sizeof(sa->sin6_addr);
+        rc = 0;
+      }
+      if (port != NULL) {
+        *port   = ntohs (sa->sin6_port);
         rc = 0;
       }
     }
 #endif
-  }
-
-  // Copy remote port number
-  if (port != NULL) {
-#if defined(RTE_Network_IPv6)
-    *port = ntohs(addr.sin6_port);
-#else
-    *port = ntohs(addr.sin_port);
-#endif
-    rc = 0;
   }
 
   return rc;
