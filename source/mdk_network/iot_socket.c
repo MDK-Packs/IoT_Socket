@@ -246,6 +246,7 @@ int32_t iotSocketConnect (int32_t socket, const uint8_t *ip, uint32_t ip_len, ui
   switch (ip_len) {
     case NET_ADDR_IP4_LEN: {
       SOCKADDR_IN *sa = (SOCKADDR_IN *)&addr;
+      sa->sin_family = AF_INET;
       memcpy(&sa->sin_addr, ip, NET_ADDR_IP4_LEN);
       sa->sin_port = htons(port);
       addr_len     = sizeof(SOCKADDR_IN);
@@ -368,6 +369,7 @@ int32_t iotSocketRecvFrom (int32_t socket, void *buf, uint32_t len, uint8_t *ip,
 
 // Check if socket is writable
 static int32_t socket_check_write (int32_t socket) {
+  timeval tv;
   fd_set fds;
   int32_t nr;
 
@@ -377,7 +379,8 @@ static int32_t socket_check_write (int32_t socket) {
 
   FD_ZERO(&fds);
   FD_SET(socket, &fds);
-  nr = select (socket+1, NULL, &fds, NULL, NULL);
+  memset (&tv, 0, sizeof(tv));
+  nr = select (socket+1, NULL, &fds, NULL, &tv);
   if (nr == 0) {
     return IOT_SOCKET_ERROR;
   }
@@ -582,7 +585,7 @@ int32_t iotSocketSetOpt (int32_t socket, int32_t opt_id, const void *opt_val, ui
       if (opt_len != sizeof(unsigned long)) {
         return IOT_SOCKET_EINVAL;
       }
-      rc = ioctlsocket(socket, FIONBIO, (unsigned long *)&opt_val);
+      rc = ioctlsocket(socket, FIONBIO, (unsigned long *)opt_val);
       if (rc == 0) {
         sock_attr[socket-1].ionbio = *(uint32_t *)opt_val ? 1 : 0;
       }
