@@ -22,6 +22,7 @@ Directory Structure
 | documentation      | IoT Socket pack documentation                       |
 | include            | Header file with the IoT Socket API                 |
 | source             | Source files                                        |
+| source/lwip        | Implementation for the lwIP network stack           |
 | source/mdk_network | Implementation for the MDK-Middleware network stack |
 | source/wifi        | Implementation for a WiFi CMSIS-Driver              |
 
