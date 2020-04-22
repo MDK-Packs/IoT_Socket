@@ -7,7 +7,7 @@
   <url>https://github.com/MDK-Packs/Pack/raw/master/IoT_Socket/</url>
   <license>LICENSE.txt</license>
   <releases>
-    <release version="1.2.0">
+    <release version="1.2.0" date="2020-04-22">
       Updated IoT Socket API V1.2.0 (support for polling Socket Receive/Send)
       Updated IoT Socket implementation with MDK Network
       Added IoT Socket implementation with lwIP
