@@ -412,7 +412,10 @@ int32_t iotSocketSend (int32_t socket, const void *buf, uint32_t len) {
   }
   rc = send(socket, buf, len, 0);
   if (rc < 0) {
-    return errno_to_rc ();
+    rc = errno_to_rc ();
+    if (rc == IOT_SOCKET_EINPROGRESS && sock_attr[socket-LWIP_SOCKET_OFFSET].ionbio) {
+      return IOT_SOCKET_EAGAIN;
+    }
   }
 
   return rc;
