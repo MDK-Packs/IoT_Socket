@@ -259,6 +259,7 @@ int32_t iotSocketConnect (int32_t socket, const uint8_t *ip, uint32_t ip_len, ui
       sa->sin_port   = lwip_htons((port));
       memcpy(&sa->sin_addr, ip, sizeof(struct in_addr));
       memset(sa->sin_zero, 0, SIN_ZERO_LEN);
+      if (sa->sin_addr.s_addr == 0) return IOT_SOCKET_EINVAL;
     } break;
 #if defined(RTE_Network_IPv6)
     case sizeof(struct in6_addr): {
@@ -582,11 +583,12 @@ int32_t iotSocketGetOpt (int32_t socket, int32_t opt_id, void *opt_val, uint32_t
       rc = getsockopt(socket, SOL_SOCKET, SO_TYPE,      (char *)opt_val, opt_len);
       break;
     default:
-      return IOT_SOCKET_ENOTSUP;
+      return IOT_SOCKET_EINVAL;
   }
   if (rc < 0) {
     return errno_to_rc ();
   }
+  if (*opt_len > 4) *opt_len = 4;
 
   return rc;
 }
@@ -624,7 +626,7 @@ int32_t iotSocketSetOpt (int32_t socket, int32_t opt_id, const void *opt_val, ui
     case IOT_SOCKET_SO_TYPE:
       return IOT_SOCKET_EINVAL;
     default:
-      return IOT_SOCKET_ENOTSUP;
+      return IOT_SOCKET_EINVAL;
   }
   if (rc < 0) {
     return errno_to_rc ();
