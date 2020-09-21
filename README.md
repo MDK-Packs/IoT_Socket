@@ -1,5 +1,5 @@
 # IoT_Socket
-Simple IP Socket (BSD like)
+Simple IP Socket (BSD like). [The interface documentation is here](https://mdk-packs.github.io/IoT_Socket/html/index.html)
 
 ## Purpose
 This repository contains two implementations of a simple BSD like IoT socket interface. The IoT Socket API is the glue logic
