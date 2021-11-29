@@ -330,7 +330,7 @@ extern int32_t iotSocketClose (int32_t socket);
                  - length of supplied 'ip' on input.
                  - length of stored 'ip' on output.
   \return        status information:
-                 - 0                        = Operation successful.
+                 - 0                             = Operation successful.
                  - \ref IOT_SOCKET_EINVAL        = Invalid argument.
                  - \ref IOT_SOCKET_ENOTSUP       = Operation not supported.
                  - \ref IOT_SOCKET_ETIMEDOUT     = Operation timed out.
