@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019 Arm Limited. All rights reserved.
+ * Copyright (c) 2018-2020 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -15,11 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * $Date:        14. February 2019
- * $Revision:    V1.1.0
+ * $Date:        27. January 2020
+ * $Revision:    V1.2.0
  *
  * Project:      IoT Socket API definitions
  *
+ * Version 1.2.0
+ *   Extended iotSocketRecv/RecvFrom/Send/SendTo (support for polling)
  * Version 1.1.0
  *   Added function iotSocketRecvFrom
  *   Added function iotSocketSendTo
@@ -44,58 +46,27 @@ extern "C"
 
 #include <stdint.h>
 
-/**
- \addtogroup iotSocketAddressFamily
-@{
-*/
-/**** Address Family definitions  *****/
+
+/**** Address Family definitions ****/
 #define IOT_SOCKET_AF_INET              1       ///< IPv4
 #define IOT_SOCKET_AF_INET6             2       ///< IPv6
-/**
-@}
-*/
 
-/**
- \addtogroup iotSocketType
-@{
-*/ 
-/**** Socket Type Definitions  *****/
+/**** Socket Type definitions ****/
 #define IOT_SOCKET_SOCK_STREAM          1       ///< Stream socket
 #define IOT_SOCKET_SOCK_DGRAM           2       ///< Datagram socket
-/**
-@}
-*/
 
-/**
- \addtogroup iotSocketProtocol
-@{
-*/
-/**** Socket Protocol Definitions  *****/
+/**** Socket Protocol definitions ****/
 #define IOT_SOCKET_IPPROTO_TCP          1       ///< TCP
 #define IOT_SOCKET_IPPROTO_UDP          2       ///< UDP
-/**
-@}
-*/
 
-/**
- \addtogroup iotSocketOptions
-@{
-*/
-/**** Socket Options Definitions  *****/
+/**** Socket Option definitions ****/
 #define IOT_SOCKET_IO_FIONBIO           1       ///< Non-blocking I/O (Set only, default = 0); opt_val = &nbio, opt_len = sizeof(nbio), nbio (integer): 0=blocking, non-blocking otherwise
 #define IOT_SOCKET_SO_RCVTIMEO          2       ///< Receive timeout in ms (default = 0); opt_val = &timeout, opt_len = sizeof(timeout)
 #define IOT_SOCKET_SO_SNDTIMEO          3       ///< Send timeout in ms (default = 0); opt_val = &timeout, opt_len = sizeof(timeout)
 #define IOT_SOCKET_SO_KEEPALIVE         4       ///< Keep-alive messages (default = 0); opt_val = &keepalive, opt_len = sizeof(keepalive), keepalive (integer): 0=disabled, enabled otherwise
 #define IOT_SOCKET_SO_TYPE              5       ///< Socket Type (Get only); opt_val = &socket_type, opt_len = sizeof(socket_type), socket_type (integer): IOT_SOCKET_SOCK_xxx
-/**
-@}
-*/
 
-/**
- \addtogroup iotSocketReturnCodes
-@{
-*/
-/**** Socket Return Codes *****/
+/**** Socket Return Codes ****/
 #define IOT_SOCKET_ERROR                (-1)    ///< Unspecified error
 #define IOT_SOCKET_ESOCK                (-2)    ///< Invalid socket
 #define IOT_SOCKET_EINVAL               (-3)    ///< Invalid argument
@@ -112,14 +83,7 @@ extern "C"
 #define IOT_SOCKET_EALREADY             (-14)   ///< Connection already in progress
 #define IOT_SOCKET_EADDRINUSE           (-15)   ///< Address in use
 #define IOT_SOCKET_EHOSTNOTFOUND        (-16)   ///< Host not found
-/**
-@}
-*/
 
-/**
- \addtogroup iotSocketAPI
-@{
-*/
 
 /**
   \brief         Create a communication socket.
@@ -133,7 +97,6 @@ extern "C"
                  - \ref IOT_SOCKET_ENOMEM        = Not enough memory.
                  - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
- 
 extern int32_t iotSocketCreate (int32_t af, int32_t type, int32_t protocol);
 
 /**
@@ -212,7 +175,7 @@ extern int32_t iotSocketConnect (int32_t socket, const uint8_t *ip, uint32_t ip_
   \param[out]    buf      pointer to buffer where data should be stored.
   \param[in]     len      length of buffer (in bytes).
   \return        status information:
-                 - number of bytes received (>0).
+                 - number of bytes received (>=0).
                  - \ref IOT_SOCKET_ESOCK         = Invalid socket.
                  - \ref IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
                  - \ref IOT_SOCKET_ENOTCONN      = Socket is not connected.
@@ -234,7 +197,7 @@ extern int32_t iotSocketRecv (int32_t socket, void *buf, uint32_t len);
                  - length of stored 'ip' on output.
   \param[out]    port     pointer to buffer where remote source port shall be returned (NULL for none).
   \return        status information:
-                 - number of bytes received (>0).
+                 - number of bytes received (>=0).
                  - \ref IOT_SOCKET_ESOCK         = Invalid socket.
                  - \ref IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
                  - \ref IOT_SOCKET_ENOTCONN      = Socket is not connected.
@@ -251,7 +214,7 @@ extern int32_t iotSocketRecvFrom (int32_t socket, void *buf, uint32_t len, uint8
   \param[in]     buf      pointer to buffer containing data to send.
   \param[in]     len      length of data (in bytes).
   \return        status information:
-                 - number of bytes sent (>0).
+                 - number of bytes sent (>=0).
                  - \ref IOT_SOCKET_ESOCK         = Invalid socket.
                  - \ref IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
                  - \ref IOT_SOCKET_ENOTCONN      = Socket is not connected.
@@ -271,7 +234,7 @@ extern int32_t iotSocketSend (int32_t socket, const void *buf, uint32_t len);
   \param[in]     ip_len   length of 'ip' address in bytes.
   \param[in]     port     remote destination port number.
   \return        status information:
-                 - number of bytes sent (>0).
+                 - number of bytes sent (>=0).
                  - \ref IOT_SOCKET_ESOCK         = Invalid socket.
                  - \ref IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
                  - \ref IOT_SOCKET_ENOTCONN      = Socket is not connected.
@@ -367,7 +330,7 @@ extern int32_t iotSocketClose (int32_t socket);
                  - length of supplied 'ip' on input.
                  - length of stored 'ip' on output.
   \return        status information:
-                 - 0                        = Operation successful.
+                 - 0                             = Operation successful.
                  - \ref IOT_SOCKET_EINVAL        = Invalid argument.
                  - \ref IOT_SOCKET_ENOTSUP       = Operation not supported.
                  - \ref IOT_SOCKET_ETIMEDOUT     = Operation timed out.
@@ -375,10 +338,6 @@ extern int32_t iotSocketClose (int32_t socket);
                  - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketGetHostByName (const char *name, int32_t af, uint8_t *ip, uint32_t *ip_len);
-
-/**
-@}
-*/
 
 #ifdef  __cplusplus
 }

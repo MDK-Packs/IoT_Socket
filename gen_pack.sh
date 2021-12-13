@@ -47,20 +47,19 @@ if [ ! -d $PACK_BUILD ]; then
   mkdir $PACK_BUILD
 fi
 
-# Generate documenation
-DOCUMENTATION_DIR = ./documentation/html/
-if [ -d $DOCUMENTATION_DIR]; then
-   rm -rf $DOCUMENTATION_DIR
-fi
-./gen_doc.bat
-# Copy documentation into $PACK_BUILD
-cp -vr ./Documentation/html $PACK_BUILD/documentation/
+# Generate documentation
+pushd ./documentation
+./genDoc.bat
+popd
+# Move documentation into $PACK_BUILD
+mv -v ./documentation/html $PACK_BUILD/documentation/
 
-# Copy file into $PACK_BUILD
+# Copy files into $PACK_BUILD
 cp -f  ./$PACK_VENDOR.$PACK_NAME.pdsc $PACK_BUILD/ 
 cp -f  ./LICENSE.txt $PACK_BUILD/ 
 cp -vr ./include $PACK_BUILD/
 cp -vr ./source $PACK_BUILD/
+cp -vr ./template $PACK_BUILD/
 
 # Run Pack Check and generate PackName file
 $UTILITIES_DIR/$UTILITIES_OS/PackChk.exe $PACK_BUILD/$PACK_VENDOR.$PACK_NAME.pdsc -n PackName.txt -x M362
