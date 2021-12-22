@@ -24,7 +24,6 @@ Directory Structure
 | source             | Source files                                        |
 | source/lwip        | Implementation for the lwIP network stack           |
 | source/mdk_network | Implementation for the MDK-Middleware network stack |
-| source/vht         | Implementation for VHT (Virtual Hardware Target)    |
 | source/wifi        | Implementation for a WiFi CMSIS-Driver              |
 | source/mux         | IoT Socket Multiplexer                              |
 | template           | Template files                                      |
