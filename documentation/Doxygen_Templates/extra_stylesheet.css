@@ -948,7 +948,7 @@ table.doxtable th {
 }
 
 table.doxtable tr:nth-child(even) {
-	background-color: #F9FAFC; /*var(--arm_light_gray3); */
+    background-color: #F9FAFC; /*var(--arm_light_gray3); */
 }
 
 table.fieldtable {
