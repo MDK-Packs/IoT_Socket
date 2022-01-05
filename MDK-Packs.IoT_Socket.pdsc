@@ -10,7 +10,6 @@
     <release version="1.3.0">
       Added custom IoT Socket component
       Added IoT Socket Multiplexer component
-      Added IoT Socket implementation with VHT
       Updated IoT Socket implementation with MDK Network:
       - minor update in iotSocketGetSockName/iotSocketGetPeerName:
         port may be retrieved also without address
@@ -72,15 +71,12 @@
       <description>WiFi Driver Socket</description>
       <require Cclass="CMSIS Driver" Cgroup="WiFi" Capiversion="1.1.0"/>
     </condition>
-    <condition id="CMSIS RTOS2">
-      <description>CMSIS RTOS2 API</description>
-      <require Cclass="CMSIS" Cgroup="RTOS2"/>
-    </condition>
   </conditions>
   <components>
     <component Cclass="IoT Utility" Cgroup="Socket" Csub="Custom" Capiversion="1.2.0" Cversion="1.0.0" custom="1">
       <description>Access to #include iot_socket.h file and code template for custom implementation</description>
       <RTE_Components_h>
+        <!-- the following content goes into file 'RTE_Components.h' -->
         #define RTE_IoT_Socket                  /* IoT Socket */
       </RTE_Components_h>
       <files>
@@ -90,6 +86,7 @@
     <component Cclass="IoT Utility" Cgroup="Socket" Csub="MDK Network" Capiversion="1.2.0" Cversion="1.2.1" condition="MDK Network Socket">
       <description>IoT Socket implementation with MDK::Network</description>
       <RTE_Components_h>
+        <!-- the following content goes into file 'RTE_Components.h' -->
         #define RTE_IoT_Socket                  /* IoT Socket */
         #define RTE_IoT_Socket_MDK_Network      /* IoT Socket: MDK::Network */
       </RTE_Components_h>
@@ -100,6 +97,7 @@
     <component Cclass="IoT Utility" Cgroup="Socket" Csub="lwIP" Capiversion="1.2.0" Cversion="1.0.2" condition="lwIP Socket">
       <description>IoT Socket implementation with lwIP</description>
       <RTE_Components_h>
+        <!-- the following content goes into file 'RTE_Components.h' -->
         #define RTE_IoT_Socket                  /* IoT Socket */
         #define RTE_IoT_Socket_lwIP             /* IoT Socket: lwIP */
       </RTE_Components_h>
@@ -110,6 +108,7 @@
     <component Cclass="IoT Utility" Cgroup="Socket" Csub="WiFi" Capiversion="1.2.0" Cversion="1.0.0" condition="WiFi Driver Socket">
       <description>IoT Socket implementation with WiFi Driver</description>
       <RTE_Components_h>
+        <!-- the following content goes into file 'RTE_Components.h' -->
         #define RTE_IoT_Socket                  /* IoT Socket */
         #define RTE_IoT_Socket_WiFi             /* IoT Socket: WiFi */
       </RTE_Components_h>
@@ -117,19 +116,10 @@
         <file category="sourceC" name="source/wifi/iot_socket.c"/>
       </files>
     </component>
-    <component Cclass="IoT Utility" Cgroup="Socket" Csub="VHT" Capiversion="1.2.0" Cversion="1.0.0" condition="CMSIS RTOS2">
-      <description>IoT Socket implementation with VHT</description>
-      <RTE_Components_h>
-        #define RTE_IoT_Socket                  /* IoT Socket */
-        #define RTE_IoT_Socket_VHT              /* IoT Socket: VHT */
-      </RTE_Components_h>
-      <files>
-        <file category="sourceC" name="source/vht/iot_socket.c"/>
-      </files>
-    </component>
     <component Cclass="IoT Utility" Cgroup="Socket" Csub="Mux" Capiversion="1.2.0" Cversion="1.0.0">
       <description>IoT Socket Multiplexer</description>
       <RTE_Components_h>
+        <!-- the following content goes into file 'RTE_Components.h' -->
         #define RTE_IoT_Socket                  /* IoT Socket */
         #define RTE_IoT_Socket_Mux              /* IoT Socket: Mux */
       </RTE_Components_h>
