@@ -6,6 +6,7 @@
   <!-- web download link -->
   <url>https://github.com/MDK-Packs/Pack/raw/master/IoT_Socket/</url>
   <license>LICENSE.txt</license>
+  <repository type="git">https://github.com/MDK-Packs/IoT_Socket.git</repository>
   <releases>
     <release version="1.3.0">
       Added custom IoT Socket component
