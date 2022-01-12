@@ -112,7 +112,6 @@ ul.hierarchy {
 }
 
 em {
-	color: #000000;
 	font-style:italic;
 }
 
@@ -371,6 +370,7 @@ dl.el {
 	margin-left: -1cm;
 }
 
+
 pre.fragment {
 	font-family: monospace;
 	background-color: var(--arm_light_gray2);
@@ -391,7 +391,7 @@ div.fragment {
 
 div.line {
 	font-family: monospace;
-        font-size: 100%;
+	font-size: 100%;
 	line-height: 1.45;
 	text-wrap: unrestricted;
 	white-space: -moz-pre-wrap; /* Moz */
@@ -948,7 +948,7 @@ table.doxtable th {
 }
 
 table.doxtable tr:nth-child(even) {
-    background-color: #F9FAFC; /*var(--arm_light_gray3); */
+	background-color: #F9FAFC; /*var(--arm_light_gray3); */
 }
 
 table.fieldtable {
