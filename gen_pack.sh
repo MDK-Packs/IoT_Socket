@@ -49,10 +49,15 @@ fi
 
 # Generate documentation
 pushd ./documentation
-./genDoc.bat
+./gen_doc.sh
 popd
-# Move documentation into $PACK_BUILD
-mv -v ./documentation/html $PACK_BUILD/documentation/
+#if $PACK_BUILD/documentation folder does not exist create it
+if [ ! -d $PACK_BUILD/documentation ]; then
+  mkdir $PACK_BUILD/documentation
+fi
+# Move built documentation into $PACK_BUILD
+mv -v ./documentation/html/* $PACK_BUILD/documentation/
+rm -rf ./documentation/html/
 
 # Copy files into $PACK_BUILD
 cp -f  ./$PACK_VENDOR.$PACK_NAME.pdsc $PACK_BUILD/ 

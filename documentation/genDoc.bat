@@ -1,7 +1,7 @@
 @echo off
 
 REM ====================================================================================
-REM Batch file for generating
+REM Batch file for generating Doxygen documentation
 REM
 REM Author  : Vladimir Marchenko
 REM Date    : 4th April 2019
