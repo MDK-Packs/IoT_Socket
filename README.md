@@ -1,5 +1,5 @@
 # IoT Socket
-Simple IP Socket (BSD like). [The interface documentation is here](https://mdk-packs.github.io/IoT_Socket/html/index.html)
+Simple IP Socket (BSD like). [The interface documentation is here](https://mdk-packs.github.io/IoT_Socket/html/index.html).
 
 ## Overview
 This repository contains the code of IoT Socket - a simple [BSD like](https://en.wikipedia.org/wiki/Berkeley_sockets) IP socket interface that implements the glue logic between IoT cloud connectors (IoT clients) and the underlying communication stack as shown on the picture below.
@@ -14,7 +14,7 @@ IoT Socket implementation variants are available for the following network stack
 - [lwIP](https://en.wikipedia.org/wiki/LwIP)
 - [CMSIS-Driver WiFi](https://arm-software.github.io/CMSIS_5/Driver/html/group__wifi__interface__gr.html)
 
-Using the **IoT Socket Multiplexer** functionality it is possible to retarget communication to a different socket interface at run-time (for example from a wireless to wired connection).
+With the **IoT Socket Multiplexer** functionality it is possible to retarget communication to a different socket interface at run-time (for example from a wireless to wired connection).
 
 ### Supported IoT clients
 
