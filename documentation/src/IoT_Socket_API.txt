@@ -639,9 +639,29 @@ If the argument \em ip is \token{NULL}, the function returns error.
 
 The argument \em ip_len is a pointer to the IP address length. It should initially contain the amount of
 space pointed to by \em ip. On return it contains the actual length of the address returned in bytes.
-
 */
 
+/**
+@}
+*/
+
+/**
+\defgroup iotSocketMux IoT Socket Multiplexer API
+\brief List of APIs specific to IoT Socket Multiplexer
+\details
+See \ref iot_socket_mux for concept overview.
+*/
+
+/**
+\addtogroup iotSocketMux
+@{
+*/
+
+/**
+\struct iotSocketApi_t
+\details
+Specifies the API access structure for the \ref iotSocketRegisterApi function.
+*/
 
 /**
 \fn int32_t iotSocketRegisterApi (const iotSocketApi_t *api)
@@ -656,8 +676,82 @@ The argument \a api is a pointer to a structure of \ref iotSocketApi_t type that
 todo
 \endcode
 */
-*/
 
 /**
 @}
+*/
+
+/**
+\var iotSocketApi_t::SocketCreate
+\brief Pointer to IoT Socket create function (see \ref iotSocketCreate)
+*/
+
+/**
+\var iotSocketApi_t::SocketBind
+\brief Pointer to IoT Socket bind function (see \ref iotSocketCreate)
+*/
+
+/**
+\var iotSocketApi_t::SocketListen
+\brief Pointer to IoT Socket listen function (see \ref iotSocketListen)
+*/
+
+/**
+\var iotSocketApi_t::SocketAccept
+\brief Pointer to IoT Socket accept function (see \ref iotSocketAccept)
+*/
+
+/**
+\var iotSocketApi_t::SocketConnect
+\brief Pointer to IoT Socket connect function (see \ref iotSocketConnect)
+*/
+
+/**
+\var iotSocketApi_t::SocketRecv
+\brief Pointer to IoT Socket receive function (see \ref iotSocketRecv)
+*/
+
+/**
+\var iotSocketApi_t::SocketRecvFrom
+\brief Pointer to IoT Socket receive from function (see \ref iotSocketRecvFrom)
+*/
+
+/**
+\var iotSocketApi_t::SocketSend
+\brief Pointer to IoT Socket send function (see \ref iotSocketSend).
+*/
+
+/**
+\var iotSocketApi_t::SocketSendTo
+\brief Pointer to IoT Socket send to function (see \ref iotSocketSendTo)
+*/
+
+/**
+\var iotSocketApi_t::SocketGetSockName
+\brief Pointer to IoT Socket get socket name function (see \ref iotSocketGetSockName)
+*/
+
+/**
+\var iotSocketApi_t::SocketGetPeerName
+\brief Pointer to IoT Socket get peer name function (see \ref iotSocketGetPeerName)
+*/
+
+/**
+\var iotSocketApi_t::SocketGetOpt
+\brief Pointer to IoT Socket get option function (see \ref iotSocketGetOpt)
+*/
+
+/**
+\var iotSocketApi_t::SocketSetOpt
+\brief Pointer to IoT Socket set option function (see \ref iotSocketSetOpt)
+*/
+
+/**
+\var iotSocketApi_t::SocketClose
+\brief Pointer to IoT Socket close function (see \ref iotSocketClose)
+*/
+
+/**
+\var iotSocketApi_t::SocketGetHostByName
+\brief Pointer to IoT Socket get host by name function (see \ref iotSocketGetHostByName)
 */

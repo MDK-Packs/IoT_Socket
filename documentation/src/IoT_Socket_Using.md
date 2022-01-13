@@ -20,15 +20,15 @@ IoT Socket pack contains following implementation variants:
 
 - **Custom**: adds the API header file (`iot_socket.h`) to the include list and enables a template for custom IoT Socket implementation. See \ref iot_socket_custom for details.
 - **MDK-Network**: provides IoT Socket implementation for the [MDK-Middleware Network stack](https://www.keil.com/pack/doc/mw/Network/html/index.html).
-- **Mux**: implements IoT Socket Multiplexer that allows to retarget communication to a different socket interface at run-time (for example from wireless to wired).
+- **Mux**: implements IoT Socket Multiplexer that allows to retarget communication to a different socket interface at run-time (for example from wireless to wired). See \ref iot_socket_mux for details.
 - **WiFi**: provides IoT Socket over [CMSIS-Driver WiFi interface](https://arm-software.github.io/CMSIS_5/Driver/html/group__wifi__interface__gr.html).
 - **lwIP**: implements IoT Socket on top of the [lwIP stack](https://en.wikipedia.org/wiki/LwIP).
 
 You can add an IoT Socket variant to a µVision project as follows:
 - Open [Manage Run-Time Environment](https://www.keil.com/support/man/docs/uv4/uv4_ca_rtemanager.htm).
 - Expand *IoT Utility* group, then *Socket (API)* group.
-- Select one target IoT Socket implementation.
-- Resolve any conflicts reported in the *Validation Output* by adding required components. Press *OK*.
+- Select a single IoT Socket implementation variant.
+- Resolve any conflicts reported in the *Validation Output* by adding required components to the project. Press *OK*.
 
 ![IoT Socket in Run-Time Environment](./images/iot_socket_rte.png)
 
@@ -61,13 +61,11 @@ For example the procedure for enabling both MDK-Network and WiFi interfaces woul
   - rename the copied file, for example to `iot_socket_wifi.c`.
   - add the file to the application project.
   - rename all `iotSocketXXX` functions in the file; for example by changing the prefix and having them as `wifiSocketXXX`.
-- In the application code define two API access structures of \ref iotSocketApi_t that map the MDK-Network (`mdkSocketXXX`) and WiFi (`wifiSocketXXX`) socket functions respectively.
+- In the application code define two API access structures of \ref iotSocketApi_t type that map the MDK-Network (`mdkSocketXXX`) and WiFi (`wifiSocketXXX`) socket functions respectively.
 - Register the API of the target communication interface using \ref iotSocketRegisterApi.
 
 ## Operation flow {#iot_socket_flow}
 
 A user application typically does not need to call the IoT Socket APIs directly, and instead can rely on the IoT Client interface that manages connectivity to the target service in the cloud (AWS, Azure, Google, proprietary). [Keil Application Note 312](https://developer.arm.com/documentation/kan312) explains operation of such IoT clients and shows how IoT Socket is used by them.
 
-[**IoT Socket API functions**](./group__iotSocketAPI.html) map directly to the operation of the [BSD Socket APIs](https://en.wikipedia.org/wiki/Berkeley_sockets) and so the principles of BSD sockets shall be followed when extending IoT clients with IoT Socket support, or when implementing custom IoT Socket variants on top of other network interfaces.
-
-Differences to be explained..
+[**IoT Socket API functions**](./group__iotSocketAPI.html) resemble operation of [BSD Socket APIs](https://en.wikipedia.org/wiki/Berkeley_sockets) and so the principles of BSD sockets shall be followed when extending IoT clients with IoT Socket support, or when implementing custom IoT Socket variants on top of other network interfaces.
