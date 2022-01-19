@@ -12,6 +12,7 @@ set -o pipefail
 
 DIRNAME=$(dirname $(readlink -f $0))
 DOXYGEN=$(which doxygen 2>/dev/null)
+REQ_DXY_VERSION="1.9.2"
 REGEN=0
 
 if [[ -z "$*" ]]; then
@@ -25,8 +26,8 @@ if [[ ! -f "${DOXYGEN}" ]]; then
 else
     version=$("${DOXYGEN}" --version | sed -E 's/.*([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
     echo "Doxygen is ${DOXYGEN} at version ${version}"
-    if [[ "${version}" != "1.9.2" ]]; then
-        echo "Doxygen should be at version 1.9.2!" >&2
+    if [[ "${version}" != "${REQ_DXY_VERSION}" ]]; then
+        echo "Doxygen required to be at version ${REQ_DXY_VERSION}!" >&2
         exit 1
     fi
 fi

@@ -50,7 +50,13 @@ fi
 # Generate documentation
 pushd ./documentation
 ./gen_doc.sh
+errorlevel=$?
 popd
+if [ $errorlevel -ne 0 ]; then
+  echo "build aborted: documentation build failed"
+  exit
+fi
+
 #if $PACK_BUILD/documentation folder does not exist create it
 if [ ! -d $PACK_BUILD/documentation ]; then
   mkdir $PACK_BUILD/documentation
