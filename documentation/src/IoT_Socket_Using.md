@@ -42,7 +42,7 @@ You can add an IoT Socket variant to a µVision project as follows:
 
  ![IoT Socket Template](./images/iot_socket_template.png)
 
- - In the added template file provide custom implementations for the IoT Socket stub functions.
+ - In the added template file provide custom implementation for the IoT Socket stub functions.
 
 ### IoT Socket Multiplexer {#iot_socket_mux}
 
@@ -60,7 +60,7 @@ For example the procedure for enabling both MDK-Network and WiFi interfaces woul
   - copy `source\wifi\iot_socket.c` from the IoT Socket pack to your application folder.
   - rename the copied file, for example to `iot_socket_wifi.c`.
   - add the file to the application project.
-  - rename all `iotSocketXXX` functions in the file; for example by changing the prefix and having them as `wifiSocketXXX`.
+  - rename all `iotSocketXXX` functions in the file, for example by changing the prefix and having them as `wifiSocketXXX`.
 - In the application code define two API access structures of \ref iotSocketApi_t type that map the MDK-Network (`mdkSocketXXX`) and WiFi (`wifiSocketXXX`) socket functions respectively.
 - Register the API of the target communication interface using \ref iotSocketRegisterApi.
 
