@@ -107,7 +107,7 @@ BRIEF_MEMBER_DESC      = YES
 # brief descriptions will be completely suppressed.
 # The default value is: YES.
 
-REPEAT_BRIEF           = NO
+REPEAT_BRIEF           = YES
 
 # This tag implements a quasi-intelligent brief description abbreviator that is
 # used to form the text in various listings. Each string in this list, if found
@@ -217,7 +217,7 @@ QT_AUTOBRIEF           = NO
 # not recognized any more.
 # The default value is: NO.
 
-MULTILINE_CPP_IS_BRIEF = YES
+MULTILINE_CPP_IS_BRIEF = NO
 
 # By default Python docstrings are displayed as preformatted text and doxygen's
 # special commands cannot be used. By setting PYTHON_DOCSTRING to NO the
@@ -231,7 +231,7 @@ PYTHON_DOCSTRING       = NO
 # documentation from any documented member that it re-implements.
 # The default value is: YES.
 
-INHERIT_DOCS           = NO
+INHERIT_DOCS           = YES
 
 # If the SEPARATE_MEMBER_PAGES tag is set to YES then doxygen will produce a new
 # page for each member. If set to NO, the documentation of a member will be part
@@ -244,7 +244,7 @@ SEPARATE_MEMBER_PAGES  = NO
 # uses this value to replace tabs by spaces in code fragments.
 # Minimum value: 1, maximum value: 16, default value: 4.
 
-TAB_SIZE               = 8
+TAB_SIZE               = 2
 
 # This tag can be used to specify a number of aliases that act as commands in
 # the documentation. An alias has the form:
@@ -742,7 +742,7 @@ ENABLED_SECTIONS       =
 # documentation regardless of this setting.
 # Minimum value: 0, maximum value: 10000, default value: 30.
 
-MAX_INITIALIZER_LINES  = 1
+MAX_INITIALIZER_LINES  = 30
 
 # Set the SHOW_USED_FILES tag to NO to disable the list of files generated at
 # the bottom of the documentation of classes and structs. If set to YES, the
@@ -986,7 +986,7 @@ EXCLUDE                =
 # from the input.
 # The default value is: NO.
 
-EXCLUDE_SYMLINKS       = YES
+EXCLUDE_SYMLINKS       = NO
 
 # If the value of the INPUT tag contains directories, you can use the
 # EXCLUDE_PATTERNS tag to specify one or more wildcard patterns to exclude
@@ -1399,7 +1399,7 @@ HTML_DYNAMIC_SECTIONS  = NO
 # Minimum value: 0, maximum value: 9999, default value: 100.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_INDEX_NUM_ENTRIES = 1
+HTML_INDEX_NUM_ENTRIES = 100
 
 # If the GENERATE_DOCSET tag is set to YES, additional index files will be
 # generated that can be used as input for Apple's Xcode 3 integrated development
@@ -1622,6 +1622,18 @@ DISABLE_INDEX          = YES
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
 GENERATE_TREEVIEW      = YES
+
+# When both GENERATE_TREEVIEW and DISABLE_INDEX are set to YES, then the
+# FULL_SIDEBAR option determines if the side bar is limited to only the treeview
+# area (value NO) or if it should extend to the full height of the window (value
+# YES). Setting this to YES gives a layout similar to
+# https://docs.readthedocs.io with more room for contents, but less room for the
+# project logo, title, and description. If either GENERATOR_TREEVIEW or
+# DISABLE_INDEX is set to NO, this option has no effect.
+# The default value is: NO.
+# This tag requires that the tag GENERATE_HTML is set to YES.
+
+FULL_SIDEBAR           = NO
 
 # The ENUM_VALUES_PER_LINE tag can be used to set the number of enum values that
 # doxygen will group on one line in the generated HTML documentation.
@@ -2389,7 +2401,7 @@ HIDE_UNDOC_RELATIONS   = YES
 # set to NO
 # The default value is: NO.
 
-HAVE_DOT               = YES
+HAVE_DOT               = NO
 
 # The DOT_NUM_THREADS specifies the number of dot invocations doxygen is allowed
 # to run in parallel. When set to 0 doxygen will base this on the number of
