@@ -170,12 +170,13 @@ extern int32_t iotSocketAccept (int32_t socket, uint8_t *ip, uint32_t *ip_len, u
 extern int32_t iotSocketConnect (int32_t socket, const uint8_t *ip, uint32_t ip_len, uint16_t port);
 
 /**
-  \brief         Receive data on a connected socket.
+  \brief         Receive data or check if data is available on a connected socket.
   \param[in]     socket   socket identification number.
   \param[out]    buf      pointer to buffer where data should be stored.
-  \param[in]     len      length of buffer (in bytes).
+  \param[in]     len      length of buffer (in bytes), set len = 0 to check if data is available.
   \return        status information:
-                 - number of bytes received (>=0).
+                 - number of bytes received (>=0), if len != 0.
+                 - 0                             = Data is available (len = 0).
                  - \ref IOT_SOCKET_ESOCK         = Invalid socket.
                  - \ref IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
                  - \ref IOT_SOCKET_ENOTCONN      = Socket is not connected.
@@ -187,17 +188,18 @@ extern int32_t iotSocketConnect (int32_t socket, const uint8_t *ip, uint32_t ip_
 extern int32_t iotSocketRecv (int32_t socket, void *buf, uint32_t len);
 
 /**
-  \brief         Receive data on a socket.
+  \brief         Receive data or check if data is available on a connected socket.
   \param[in]     socket   socket identification number.
   \param[out]    buf      pointer to buffer where data should be stored.
-  \param[in]     len      length of buffer (in bytes).
+  \param[in]     len      length of buffer (in bytes), set len = 0 to check if data is available.
   \param[out]    ip       pointer to buffer where remote source address shall be returned (NULL for none).
   \param[in,out] ip_len   pointer to length of 'ip' (or NULL if 'ip' is NULL):
                  - length of supplied 'ip' on input.
                  - length of stored 'ip' on output.
   \param[out]    port     pointer to buffer where remote source port shall be returned (NULL for none).
   \return        status information:
-                 - number of bytes received (>=0).
+                 - number of bytes received (>=0), if len != 0.
+                 - 0                             = Data is available (len = 0).
                  - \ref IOT_SOCKET_ESOCK         = Invalid socket.
                  - \ref IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer or length).
                  - \ref IOT_SOCKET_ENOTCONN      = Socket is not connected.
