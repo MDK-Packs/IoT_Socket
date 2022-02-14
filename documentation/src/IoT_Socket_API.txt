@@ -95,7 +95,7 @@ code is less than \token{0}.
 
 
 /**
-\defgroup iotSocketAPI  IoT Socket API Functions
+\defgroup iotSocketAPI  IoT Socket Functions
 \brief List of IoT Socket API functions
 @{
 */
@@ -670,11 +670,6 @@ The function \b iotSocketRegisterApi registers the functions that get executed w
 
 The argument \a api is a pointer to a structure of \ref iotSocketApi_t type that provides the mapping for IoT Socket API.
 
-\b Example:
-\code
-
-todo
-\endcode
 */
 
 /**

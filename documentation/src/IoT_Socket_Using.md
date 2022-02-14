@@ -68,4 +68,4 @@ For example the procedure for enabling both MDK-Network and WiFi interfaces woul
 
 A user application typically does not need to call the IoT Socket APIs directly, and instead can rely on the IoT Client interface that manages connectivity to the target service in the cloud (AWS, Azure, Google, proprietary). [Keil Application Note 312](https://developer.arm.com/documentation/kan312) explains operation of such IoT clients and shows how IoT Socket is used by them.
 
-[**IoT Socket API functions**](./group__iotSocketAPI.html) resemble operation of [BSD Socket APIs](https://en.wikipedia.org/wiki/Berkeley_sockets) and so the principles of BSD sockets shall be followed when extending IoT clients with IoT Socket support, or when implementing custom IoT Socket variants on top of other network interfaces.
+[**IoT Socket functions**](./group__iotSocketAPI.html) resemble operation of [BSD Socket APIs](https://en.wikipedia.org/wiki/Berkeley_sockets) and so the principles of BSD sockets shall be followed when extending IoT clients with IoT Socket support, or when implementing custom IoT Socket variants on top of other network interfaces.
