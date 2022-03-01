@@ -182,7 +182,7 @@ int32_t iotSocketBind (int32_t socket, const uint8_t *ip, uint32_t ip_len, uint1
     }
     return rc;
   }
-  sock_attr[rc-LWIP_SOCKET_OFFSET].bound = 1;
+  sock_attr[socket-LWIP_SOCKET_OFFSET].bound = 1;
   return rc;
 }
 
