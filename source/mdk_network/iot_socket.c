@@ -148,7 +148,7 @@ int32_t iotSocketBind (int32_t socket, const uint8_t *ip, uint32_t ip_len, uint1
   int32_t rc;
 
   // Check parameters
-  if (ip == NULL) {
+  if ((ip == NULL) || (port == 0)) {
     return IOT_SOCKET_EINVAL;
   }
 
@@ -238,7 +238,7 @@ int32_t iotSocketConnect (int32_t socket, const uint8_t *ip, uint32_t ip_len, ui
   int32_t rc;
 
   // Check parameters
-  if (ip == NULL) {
+  if ((ip == NULL) || (port == 0)) {
     return IOT_SOCKET_EINVAL;
   }
 
@@ -470,34 +470,36 @@ int32_t iotSocketGetSockName (int32_t socket, uint8_t *ip, uint32_t *ip_len, uin
   rc = IOT_SOCKET_EINVAL;
 
   // Copy local IP address and port
-  if ((ip != NULL) && (ip_len != NULL)) {
-    if (addr.ss_family == AF_INET) {
-      SOCKADDR_IN *sa = (SOCKADDR_IN *)&addr;
-      if (*ip_len >= sizeof(sa->sin_addr)) {
-        memcpy(ip, &sa->sin_addr, sizeof(sa->sin_addr));
-        *ip_len = sizeof(sa->sin_addr);
-        rc = 0;
-      }
-      if (port != NULL) {
-        *port   = ntohs (sa->sin_port);
+  if (addr.ss_family == AF_INET) {
+    SOCKADDR_IN *sa = (SOCKADDR_IN *)&addr;
+    if ((ip != NULL) && (ip_len != NULL)) {
+      if (*ip_len >= NET_ADDR_IP4_LEN) {
+        memcpy(ip, &sa->sin_addr, NET_ADDR_IP4_LEN);
+        *ip_len = NET_ADDR_IP4_LEN;
         rc = 0;
       }
     }
+    if (port != NULL) {
+      *port = ntohs (sa->sin_port);
+      rc = 0;
+    }
+  }   
 #if defined(RTE_Network_IPv6)
-    else if (addr.ss_family == AF_INET6) {
-      SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
-      if (*ip_len >= sizeof(sa->sin6_addr)) {
-        memcpy(ip, &sa->sin6_addr, sizeof(sa->sin6_addr));
-        *ip_len = sizeof(sa->sin6_addr);
-        rc = 0;
-      }
-      if (port != NULL) {
-        *port   = ntohs (sa->sin6_port);
+  else if (addr.ss_family == AF_INET6) {
+    SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
+    if ((ip != NULL) && (ip_len != NULL)) {
+      if (*ip_len >= NET_ADDR_IP6_LEN) {
+        memcpy(ip, &sa->sin6_addr, NET_ADDR_IP6_LEN);
+        *ip_len = NET_ADDR_IP6_LEN;
         rc = 0;
       }
     }
-#endif
+    if (port != NULL) {
+      *port = ntohs (sa->sin6_port);
+      rc = 0;
+    }
   }
+#endif
 
   return rc;
 }
@@ -517,34 +519,36 @@ int32_t iotSocketGetPeerName (int32_t socket, uint8_t *ip, uint32_t *ip_len, uin
   rc = IOT_SOCKET_EINVAL;
 
   // Copy remote IP address and port
-  if ((ip != NULL) && (ip_len != NULL)) {
-    if (addr.ss_family == AF_INET) {
-      SOCKADDR_IN *sa = (SOCKADDR_IN *)&addr;
-      if (*ip_len >= sizeof(sa->sin_addr)) {
-        memcpy(ip, &sa->sin_addr, sizeof(sa->sin_addr));
-        *ip_len = sizeof(sa->sin_addr);
-        rc = 0;
-      }
-      if (port != NULL) {
-        *port   = ntohs (sa->sin_port);
+  if (addr.ss_family == AF_INET) {
+    SOCKADDR_IN *sa = (SOCKADDR_IN *)&addr;
+    if ((ip != NULL) && (ip_len != NULL)) {
+      if (*ip_len >= NET_ADDR_IP4_LEN) {
+        memcpy(ip, &sa->sin_addr, NET_ADDR_IP4_LEN);
+        *ip_len = NET_ADDR_IP4_LEN;
         rc = 0;
       }
     }
-#if defined(RTE_Network_IPv6)
-    else if (addr.ss_family == AF_INET6) {
-      SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
-      if (*ip_len >= sizeof(sa->sin6_addr)) {
-        memcpy(ip, &sa->sin6_addr, sizeof(sa->sin6_addr));
-        *ip_len = sizeof(sa->sin6_addr);
-        rc = 0;
-      }
-      if (port != NULL) {
-        *port   = ntohs (sa->sin6_port);
-        rc = 0;
-      }
+    if (port != NULL) {
+      *port = ntohs (sa->sin_port);
+      rc = 0;
     }
-#endif
   }
+#if defined(RTE_Network_IPv6)
+  else if (addr.ss_family == AF_INET6) {
+    SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
+    if ((ip != NULL) && (ip_len != NULL)) {
+      if (*ip_len >= NET_ADDR_IP6_LEN) {
+        memcpy(ip, &sa->sin6_addr, NET_ADDR_IP6_LEN);
+        *ip_len = NET_ADDR_IP6_LEN;
+        rc = 0;
+      }
+    }
+    if (port != NULL) {
+      *port = ntohs (sa->sin6_port);
+      rc = 0;
+    }
+  }
+#endif
 
   return rc;
 }
@@ -569,7 +573,7 @@ int32_t iotSocketGetOpt (int32_t socket, int32_t opt_id, void *opt_val, uint32_t
       rc = getsockopt(socket, SOL_SOCKET, SO_TYPE,      (char *)opt_val, (int *)opt_len);
       break;
     default:
-      return IOT_SOCKET_ENOTSUP;
+      return IOT_SOCKET_EINVAL;
   }
   rc = rc_bsd_to_iot(rc);
 
@@ -606,7 +610,7 @@ int32_t iotSocketSetOpt (int32_t socket, int32_t opt_id, const void *opt_val, ui
     case IOT_SOCKET_SO_TYPE:
       return IOT_SOCKET_EINVAL;
     default:
-      return IOT_SOCKET_ENOTSUP;
+      return IOT_SOCKET_EINVAL;
   }
   rc = rc_bsd_to_iot(rc);
 

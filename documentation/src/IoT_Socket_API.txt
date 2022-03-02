@@ -1,49 +1,3 @@
-/*=======0=========1=========2=========3=========4=========5=========6=========7=========8=========9=========0=========1====*/
-/**
-\mainpage
-
-Overview
-======================
-The IoT Socket pack provides a simple <a href="Modules.html"><b> IP Socket API</b></a> (BSD like) that implements the glue logic between  IoT cloud connectors and the underlying network stack.
-
-\image html iot_block_diagram_300.png "Structure of an IoT application"
-
-Currently, an implementation for the [MDK-Middleware](https://www2.keil.com/mdk5/middleware) network stack or a
-[CMSIS-Driver WiFi](https://arm-software.github.io/CMSIS_5/Driver/html/group__wifi__interface__gr.html) is available. This
-makes it easy to retarget an IoT application running on an Arm Cortex-M based microcontroller device to either wired or
-wireless IP connections. 
-
-
-Directory Structure
-======================
-
-| Directory          | Content                                             |
-|:-------------------|:--------------------------------------------------- |
-| documentation      | IoT Socket pack documentation                       |
-| include            | Header file with the IoT Socket API                 |
-| source             | Source files                                        |
-| source/lwip        | Implementation for the lwIP network stack           |
-| source/mdk_network | Implementation for the MDK-Middleware network stack |
-| source/wifi        | Implementation for a WiFi CMSIS-Driver              |
-
-
-Related GitHub repositories
-======================
-
-| Repository                  | Description                                               |
-|:--------------------------- |:--------------------------------------------------------- |
-| [CMSIS](https://github.com/ARM-software/cmsis_5)                 | CMSIS                                                                             |
-| [CMSIS-FreeRTOS](https://github.com/arm-software/CMSIS-FreeRTOS) | CMSIS-RTOS adoption of FreeRTOS                                                   |
-| [CMSIS-Driver](https://github.com/arm-software/CMSIS-Driver)     | Generic MCU driver implementations and templates for Ethernet MAC/PHY and Flash   |
-| [MDK-Packs](https://github.com/mdk-packs)                        | IoT cloud connectors as trail implementations for MDK (help us to make it generic)|
-
-License
-======================
-Provided under [Apache 2.0](https://opensource.org/licenses/Apache-2.0) license.
-
-*/
-
-
 /**
 \defgroup iotSocketMacros IoT Socket Macros
 \brief List of IoT Socket macros
@@ -141,10 +95,12 @@ code is less than \token{0}.
 
 
 /**
-\defgroup iotSocketAPI  IoT Socket API Functions
+\defgroup iotSocketAPI  IoT Socket Functions
 \brief List of IoT Socket API functions
 @{
 */
+
+
 
 /*==================   API description details ========================*/
 
@@ -170,7 +126,7 @@ Protocol                     | Description
 :----------------------------|:-------------------------------------------------
 \ref IOT_SOCKET_IPPROTO_TCP  | Must be used with \ref IOT_SOCKET_SOCK_STREAM socket type
 \ref IOT_SOCKET_IPPROTO_UDP  | Must be used with \ref IOT_SOCKET_SOCK_DGRAM socket type
- 
+
 \b Example:
  - see \ref iotSocketListen, \ref iotSocketConnect
 */
@@ -191,7 +147,7 @@ for the IPv4 address and \token{16} bytes for the IPv6 address.
 
 The argument \em port specifies the local port. If the argument \em port is \token{0}, the function returns error,
 because this port is reserved.
- 
+
 \b Example:
  - see \ref iotSocketListen
 */
@@ -207,7 +163,7 @@ The argument \em socket specifies a socket identification number returned from a
 to \ref iotSocketCreate.
 
 The argument \em backlog specifies a maximum number of connection requests that can be queued.
- 
+
 \b Example:
 \code
  
@@ -232,7 +188,7 @@ void Echo_Server_Thread (void *arg) {
       }
       if (res > 0) {
         iotSocketSend (sock, dbuf, res);            // Echo the data
-      }    
+      }
     }
     iotSocketClose (sock);
   }
@@ -282,7 +238,7 @@ behaves differently according to the type of socket:
   In non blocking mode, the function returns the error code \c IOT_SOCKET_EINPROGRESS and the connection
   is established asynchronously. Subsequent calls to \b iotSocketConnect for the same socket,
   before the connection is established, return the error code \c IOT_SOCKET_EALREADY.  When the connection
-  is established, the call to \b iotSocketConnect returns the error code \c IOT_SOCKET_EISCONN. 
+  is established, the call to \b iotSocketConnect returns the error code \c IOT_SOCKET_EISCONN.
 
 - \ref IOT_SOCKET_SOCK_DGRAM : An address filter is established between the endpoints.
 
@@ -304,7 +260,7 @@ the function returns error, because this port is reserved.
 \code
  
 static const char message[] = { "The quick brown fox jumps over the lazy dog." };
-  
+ 
 void Echo_Client_Thread (void *arg) {
   uint8_t ip[4] = { 192U, 168U, 0U, 100U };
   int32_t sock, res;
@@ -315,19 +271,21 @@ void Echo_Client_Thread (void *arg) {
  
     res = iotSocketConnect (sock, (uint8_t *)ip, sizeof(ip), 7U);
     if (res == 0) {
-      iotSocketSend (sock, message, sizeof(message));
-      res = iotSocketRecv (sock, dbuf, sizeof(dbuf));
-      if (res < 0) {
-        break;               // Error occured
-      }
-      if (res > 0) {
-        if (memcmp (dbuf, message, res) != 0) {
-          // error handling, message is not the same as sent
+      while (1) {
+        iotSocketSend (sock, message, sizeof(message));
+        res = iotSocketRecv (sock, dbuf, sizeof(dbuf));
+        if (res < 0) {
+          break;               // Receive error
         }
-      }    
+        if (res > 0) {
+          if (memcmp (dbuf, message, res) != 0) {
+            break;             // Message error, echoed message is not the same
+          }
+        }
+        osDelay (1000U);
+      }
     }
     iotSocketClose (sock);
-    osDelay (1000U);
   }
 }
 \endcode
@@ -432,7 +390,7 @@ void Echo_Server_Thread (void *arg) {
       }
       if (res > 0) {            // Echo the data
         iotSocketSendTo (sock, dbuf, res, (uint8_t *)ip, ip_len, port);
-      }    
+      }
     }
     iotSocketClose (sock);
   }
@@ -637,7 +595,7 @@ uint32_t nonblocking = 0U;    // Blocking mode
 uint32_t timeout = 10000U;    // Timeout 10 seconds
  
 iotSocketSetOpt (sock, IOT_SOCKET_IO_FIONBIO, &nonblocking, sizeof(nonblocking));
-iotSocketSetOpt (sock, IOT_SOCKET_SO_RCVTIMEO, &timeout, sizeof(timeout)); 
+iotSocketSetOpt (sock, IOT_SOCKET_SO_RCVTIMEO, &timeout, sizeof(timeout));
 iotSocketSetOpt (sock, IOT_SOCKET_SO_SNDTIMEO, &timeout, sizeof(timeout));
 \endcode
 */
@@ -663,7 +621,7 @@ In non blocking mode, you must call the \b iotSocketClose function again if the 
 \fn int32_t iotSocketGetHostByName (const char *name, int32_t af, uint8_t *ip, uint32_t *ip_len)
 \details
 The function \b iotSocketGetHostByName retrieves host information corresponding to
-a host name from a host database. 
+a host name from a host database.
 
 It does this by sending DNS requests to the DNS server.
 The IP address of the DNS server is specified in the network interface configuration or can be
@@ -683,9 +641,114 @@ If the argument \em ip is \token{NULL}, the function returns error.
 
 The argument \em ip_len is a pointer to the IP address length. It should initially contain the amount of
 space pointed to by \em ip. On return it contains the actual length of the address returned in bytes.
+*/
+
+/**
+@}
+*/
+
+/**
+\defgroup iotSocketMux IoT Socket Multiplexer API
+\brief List of APIs specific to IoT Socket Multiplexer
+\details
+See \ref iot_socket_mux for concept overview.
+*/
+
+/**
+\addtogroup iotSocketMux
+@{
+*/
+
+/**
+\struct iotSocketApi_t
+\details
+Specifies the API access structure for the \ref iotSocketRegisterApi function.
+*/
+
+/**
+\fn int32_t iotSocketRegisterApi (const iotSocketApi_t *api)
+\details
+The function \b iotSocketRegisterApi registers the functions that get executed when corresponding IoT Socket API is called. It is available only with IoT Socket Multiplexer (Mux variant).
+
+The argument \a api is a pointer to a structure of \ref iotSocketApi_t type that provides the mapping for IoT Socket API.
 
 */
 
 /**
 @}
+*/
+
+/**
+\var iotSocketApi_t::SocketCreate
+\brief Pointer to IoT Socket create function (see \ref iotSocketCreate)
+*/
+
+/**
+\var iotSocketApi_t::SocketBind
+\brief Pointer to IoT Socket bind function (see \ref iotSocketCreate)
+*/
+
+/**
+\var iotSocketApi_t::SocketListen
+\brief Pointer to IoT Socket listen function (see \ref iotSocketListen)
+*/
+
+/**
+\var iotSocketApi_t::SocketAccept
+\brief Pointer to IoT Socket accept function (see \ref iotSocketAccept)
+*/
+
+/**
+\var iotSocketApi_t::SocketConnect
+\brief Pointer to IoT Socket connect function (see \ref iotSocketConnect)
+*/
+
+/**
+\var iotSocketApi_t::SocketRecv
+\brief Pointer to IoT Socket receive function (see \ref iotSocketRecv)
+*/
+
+/**
+\var iotSocketApi_t::SocketRecvFrom
+\brief Pointer to IoT Socket receive from function (see \ref iotSocketRecvFrom)
+*/
+
+/**
+\var iotSocketApi_t::SocketSend
+\brief Pointer to IoT Socket send function (see \ref iotSocketSend).
+*/
+
+/**
+\var iotSocketApi_t::SocketSendTo
+\brief Pointer to IoT Socket send to function (see \ref iotSocketSendTo)
+*/
+
+/**
+\var iotSocketApi_t::SocketGetSockName
+\brief Pointer to IoT Socket get socket name function (see \ref iotSocketGetSockName)
+*/
+
+/**
+\var iotSocketApi_t::SocketGetPeerName
+\brief Pointer to IoT Socket get peer name function (see \ref iotSocketGetPeerName)
+*/
+
+/**
+\var iotSocketApi_t::SocketGetOpt
+\brief Pointer to IoT Socket get option function (see \ref iotSocketGetOpt)
+*/
+
+/**
+\var iotSocketApi_t::SocketSetOpt
+\brief Pointer to IoT Socket set option function (see \ref iotSocketSetOpt)
+*/
+
+/**
+\var iotSocketApi_t::SocketClose
+\brief Pointer to IoT Socket close function (see \ref iotSocketClose)
+*/
+
+/**
+\var iotSocketApi_t::SocketGetHostByName
+\brief Pointer to IoT Socket get host by name function (see \ref iotSocketGetHostByName)
 */
