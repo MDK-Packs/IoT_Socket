@@ -17,6 +17,7 @@
       - corrected iotSocketGetOpt/iotSocketSetOpt return value for invalid options
       Updated IoT Socket implementation with lwIP:
       - corrected iotSocketGetOpt/iotSocketSetOpt return value for invalid options
+      - corrected socket bind attribute handling in iotSocketBind
     </release>
     <release version="1.2.1" date="2020-07-13">
       Updated IoT Socket implementation with lwIP:
@@ -95,7 +96,7 @@
         <file category="sourceC" name="source/mdk_network/iot_socket.c"/>
       </files>
     </component>
-    <component Cclass="IoT Utility" Cgroup="Socket" Csub="lwIP" Capiversion="1.2.0" Cversion="1.0.2" condition="lwIP Socket">
+    <component Cclass="IoT Utility" Cgroup="Socket" Csub="lwIP" Capiversion="1.2.0" Cversion="1.0.3" condition="lwIP Socket">
       <description>IoT Socket implementation with lwIP</description>
       <RTE_Components_h>
         <!-- the following content goes into file 'RTE_Components.h' -->
