@@ -1,6 +1,6 @@
 # Overview {#mainpage}
 
-The IoT Socket pack provides a simple [**IP Socket API**](./Modules.html) ([BSD like](https://en.wikipedia.org/wiki/Berkeley_sockets)) that implements the glue logic between IoT cloud connectors (IoT clients) and the underlying communication stack as shown on the picture below.
+The IoT Socket pack provides a simple [**IP Socket API**](./modules.html) ([BSD like](https://en.wikipedia.org/wiki/Berkeley_sockets)) that implements the glue logic between IoT cloud connectors (IoT clients) and the underlying communication stack as shown on the picture below.
 
 ![Structure of an IoT application](./images/iot_block_diagram.png)
 
