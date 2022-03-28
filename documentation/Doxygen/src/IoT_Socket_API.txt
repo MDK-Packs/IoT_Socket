@@ -126,6 +126,7 @@ Protocol                     | Description
 :----------------------------|:-------------------------------------------------
 \ref IOT_SOCKET_IPPROTO_TCP  | Must be used with \ref IOT_SOCKET_SOCK_STREAM socket type
 \ref IOT_SOCKET_IPPROTO_UDP  | Must be used with \ref IOT_SOCKET_SOCK_DGRAM socket type
+\token{0}                    | The system selects a matching protocol for the socket type
 
 \b Example:
  - see \ref iotSocketListen, \ref iotSocketConnect
