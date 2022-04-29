@@ -60,6 +60,9 @@
 \details Enables or disables the keep-alive mode for the stream socket.
 \def IOT_SOCKET_SO_TYPE
 \details Obtains the type of the socket.
+\def IOT_SOCKET_SO_REUSEADDR
+\details Set socket to allow reuse of local address.
+
 @}
 */
 
@@ -585,6 +588,7 @@ Option                       | Description
 \ref IOT_SOCKET_SO_RCVTIMEO  | Timeout for receiving in blocking mode
 \ref IOT_SOCKET_SO_SNDTIMEO  | Timeout for sending in blocking mode
 \ref IOT_SOCKET_SO_KEEPALIVE | Keep-alive mode for the stream socket
+\ref IOT_SOCKET_SO_REUSEADDR | Set socket to allow reuse of local address
 
 The argument \em opt_val points to the buffer containing the value of the \em opt_id.
 

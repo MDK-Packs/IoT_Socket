@@ -65,6 +65,7 @@ extern "C"
 #define IOT_SOCKET_SO_SNDTIMEO          3       ///< Send timeout in ms (default = 0); opt_val = &timeout, opt_len = sizeof(timeout)
 #define IOT_SOCKET_SO_KEEPALIVE         4       ///< Keep-alive messages (default = 0); opt_val = &keepalive, opt_len = sizeof(keepalive), keepalive (integer): 0=disabled, enabled otherwise
 #define IOT_SOCKET_SO_TYPE              5       ///< Socket Type (Get only); opt_val = &socket_type, opt_len = sizeof(socket_type), socket_type (integer): IOT_SOCKET_SOCK_xxx
+#define IOT_SOCKET_SO_REUSEADDR         6       ///< Reuse of local address (Set only, default = 0); opt_val = &reuseaddr, opt_len = sizeof(reuseaddr), reuseaddr (integer): enabled if non-zero
 
 /**** Socket Return Codes ****/
 #define IOT_SOCKET_ERROR                (-1)    ///< Unspecified error

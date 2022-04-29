@@ -609,6 +609,8 @@ int32_t iotSocketSetOpt (int32_t socket, int32_t opt_id, const void *opt_val, ui
       break;
     case IOT_SOCKET_SO_TYPE:
       return IOT_SOCKET_EINVAL;
+    case IOT_SOCKET_SO_REUSEADDR:
+      return IOT_SOCKET_ENOTSUP;
     default:
       return IOT_SOCKET_EINVAL;
   }
