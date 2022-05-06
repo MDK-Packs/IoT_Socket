@@ -571,10 +571,18 @@ int32_t iotSocketGetOpt (int32_t socket, int32_t opt_id, void *opt_val, uint32_t
     case IOT_SOCKET_IO_FIONBIO:
       return IOT_SOCKET_EINVAL;
     case IOT_SOCKET_SO_RCVTIMEO:
-      rc = getsockopt(socket, SOL_SOCKET, SO_RCVTIMEO,  (char *)opt_val, opt_len);
-      break;
     case IOT_SOCKET_SO_SNDTIMEO:
-      rc = getsockopt(socket, SOL_SOCKET, SO_SNDTIMEO,  (char *)opt_val, opt_len);
+      if (*opt_len != sizeof(uint32_t)) {
+        return IOT_SOCKET_EINVAL;
+      }
+      const int32_t lwip_opt_id = (opt_id == IOT_SOCKET_SO_RCVTIMEO) ? SO_RCVTIMEO : SO_SNDTIMEO;
+#if !defined(LWIP_SO_SNDRCVTIMEO_NONSTANDARD) || LWIP_SO_SNDRCVTIMEO_NONSTANDARD == 0
+      struct timeval tv;
+      rc = getsockopt(socket, SOL_SOCKET, lwip_opt_id,  (const char *)&tv, sizeof(tv));
+      *((uint32_t*)opt_val) = tv.tv_sec * 1000 + (tv.tv_usec / 1000U);
+#else
+      rc = getsockopt(socket, SOL_SOCKET, lwip_opt_id,  (char *)opt_val, opt_len);
+#endif
       break;
     case IOT_SOCKET_SO_KEEPALIVE:
       rc = getsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, (char *)opt_val, opt_len);
@@ -611,14 +619,20 @@ int32_t iotSocketSetOpt (int32_t socket, int32_t opt_id, const void *opt_val, ui
       }
       break;
     case IOT_SOCKET_SO_RCVTIMEO:
-      rc = setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO,  (const char *)opt_val, opt_len);
-      if (rc == 0) {
-        sock_attr[socket-LWIP_SOCKET_OFFSET].tv_sec  = *(const uint32_t *)opt_val / 1000U;
-        sock_attr[socket-LWIP_SOCKET_OFFSET].tv_msec = *(const uint32_t *)opt_val % 1000U;
+    case IOT_SOCKET_SO_SNDTIMEO: ; /* do not remove the semi-colon */
+      const int32_t lwip_opt_id = (opt_id == IOT_SOCKET_SO_RCVTIMEO) ? SO_RCVTIMEO : SO_SNDTIMEO;
+#if !defined(LWIP_SO_SNDRCVTIMEO_NONSTANDARD) || LWIP_SO_SNDRCVTIMEO_NONSTANDARD == 0
+      struct timeval tv;
+      tv.tv_sec = *(uint32_t *)opt_val / 1000U;
+      tv.tv_usec = (*(uint32_t *)opt_val % 1000U) * 1000U;
+      rc = setsockopt(socket, SOL_SOCKET, lwip_opt_id,  (const char *)&tv, sizeof(tv));
+#else
+      rc = setsockopt(socket, SOL_SOCKET, lwip_opt_id,  (const char *)opt_val, (int)opt_len);
+#endif
+      if ((opt_id == IOT_SOCKET_SO_RCVTIMEO) && (rc == 0)) {
+        sock_attr[socket-1].tv_sec  = *(uint32_t *)opt_val / 1000U;
+        sock_attr[socket-1].tv_msec = *(uint32_t *)opt_val % 1000U;
       }
-      break;
-    case IOT_SOCKET_SO_SNDTIMEO:
-      rc = setsockopt(socket, SOL_SOCKET, SO_SNDTIMEO,  (const char *)opt_val, opt_len);
       break;
     case IOT_SOCKET_SO_KEEPALIVE:
       rc = setsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, (const char *)opt_val, opt_len);
