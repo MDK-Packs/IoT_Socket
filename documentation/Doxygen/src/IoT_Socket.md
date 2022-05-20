@@ -38,6 +38,24 @@ Following IoT client implementations work on top of the IoT Socket API either di
 
 ![Examples of IoT applications](./images/iot_examples.png)
 
+## Limitations {#limits}
+
+The table below lists the differences that IoT socket has comparing to BSD socket capabilities.
+
+|Functionality     | Support in IoT Socket  | Support in BSD Socket
+|------------------|------------------------|-------------------
+| Address family   | Only IPv4 and optionally IPv6, see \ref iotSocketAddressFamily. | Many other address families.
+| Socket type      | Only STREAM and DGRAM, see \ref iotSocketType.   | Many other socket types.
+| Socket protocol  | Only TCP and UDP, see \ref iotSocketProtocol.    | Many other protocols.
+| Socket options   | Only reduced set, see \ref iotSocketOptions.     | Many other socket options.
+| Address representation | Uses pointer to array of bytes, 4-bytes for IPv4, 16-bytes for IPv6, length is supplied with "ip_len" parameter. Port number is specified in host byte order Little Endian (LE). | Uses structure "sockaddr" that contains address family, IP address and port number. IP address and port number are specified in network byte order Big Endian (BE).
+| Errors   | Returns error code as specified in \ref iotSocketReturnCodes.  | Returns -1 and sets the global "errno" on failure.
+| Host name resolving   | Function \ref iotSocketGetHostByName retrieves IPv4 or IPv6 address, requested address family is specified in "af" parameter. | Function "gethostbyname" retrieves only IPv4 addresses. The API function "getaddrinfo" is used to retrieve IPv4 or IPv6 addresses.
+| Read/write ability check<sup>1</sup> | Uses receive functions called with parameter len=0. The function returns 0 if the socket is readable or writeable, otherwise the error code. There is no "select" function available. | Uses "select" function with a 0-timeout to check if the socket is readable or writeable.
+| Address conversion | APIs have no address conversion functions between ASCII (dot format) and network format.    | Supports address conversion between ASCII and network format: "inet_addr", "inet_aton", "inet_ntoa", "inet_pton", "inet_ntop"
+
+> <sup>1</sup> Readable/writeable socket would not block on a send/receive call.
+
 ## License {#license}
 
 IoT Socket is provided under [Apache 2.0](https://opensource.org/licenses/Apache-2.0) license.
