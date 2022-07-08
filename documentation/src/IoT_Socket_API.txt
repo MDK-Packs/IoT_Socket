@@ -543,12 +543,12 @@ to \ref iotSocketCreate.
 
 The argument \em opt_id is the socket option for which the value is to be retrieved. The following
 socket options are supported:
-Option                       | Description
-:----------------------------|:-------------------------------------------------
-\ref IOT_SOCKET_SO_RCVTIMEO  | Timeout for receiving in blocking mode
-\ref IOT_SOCKET_SO_SNDTIMEO  | Timeout for sending in blocking mode
-\ref IOT_SOCKET_SO_KEEPALIVE | Keep-alive mode for the stream socket
-\ref IOT_SOCKET_SO_TYPE      | Type of the socket (stream or datagram)
+Option                       | Type    | Description
+:----------------------------|:--------|:-------------------------------------------------
+\ref IOT_SOCKET_SO_RCVTIMEO  | int32_t | Timeout for receiving in blocking mode
+\ref IOT_SOCKET_SO_SNDTIMEO  | int32_t | Timeout for sending in blocking mode
+\ref IOT_SOCKET_SO_KEEPALIVE | int32_t | Keep-alive mode for the stream socket
+\ref IOT_SOCKET_SO_TYPE      | int32_t | Type of the socket (stream or datagram)
 
 The argument \em opt_val points to the buffer that will receive the value of the \em opt_id.
 
@@ -579,12 +579,12 @@ to \ref iotSocketCreate.
 
 The argument \em opt_id is the socket option for which the value is to be set. The following
 socket options are supported:
-Option                       | Description
-:----------------------------|:-------------------------------------------------
-\ref IOT_SOCKET_IO_FIONBIO   | Non-blocking mode for the socket
-\ref IOT_SOCKET_SO_RCVTIMEO  | Timeout for receiving in blocking mode
-\ref IOT_SOCKET_SO_SNDTIMEO  | Timeout for sending in blocking mode
-\ref IOT_SOCKET_SO_KEEPALIVE | Keep-alive mode for the stream socket
+Option                       | Type    | Description
+:----------------------------|:--------|:-------------------------------------------------
+\ref IOT_SOCKET_IO_FIONBIO   | int32_t | Non-blocking mode for the socket
+\ref IOT_SOCKET_SO_RCVTIMEO  | int32_t | Timeout for receiving in blocking mode
+\ref IOT_SOCKET_SO_SNDTIMEO  | int32_t | Timeout for sending in blocking mode
+\ref IOT_SOCKET_SO_KEEPALIVE | int32_t | Keep-alive mode for the stream socket
 
 The argument \em opt_val points to the buffer containing the value of the \em opt_id.
 
