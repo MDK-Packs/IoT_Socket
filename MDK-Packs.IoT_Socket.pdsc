@@ -8,6 +8,10 @@
   <license>LICENSE</license>
   <repository type="git">https://github.com/MDK-Packs/IoT_Socket.git</repository>
   <releases>
+    <release version="1.3.1">
+      Updated IoT Socket implementation with lwIP:
+      - corrected iotSocketGetOpt/iotSocketSetOpt timeout options
+    </release>
     <release version="1.3.0" date="2022-03-02">
       Added custom IoT Socket component
       Added IoT Socket Multiplexer component
@@ -96,7 +100,7 @@
         <file category="sourceC" name="source/mdk_network/iot_socket.c"/>
       </files>
     </component>
-    <component Cclass="IoT Utility" Cgroup="Socket" Csub="lwIP" Capiversion="1.2.0" Cversion="1.0.3" condition="lwIP Socket">
+    <component Cclass="IoT Utility" Cgroup="Socket" Csub="lwIP" Capiversion="1.2.0" Cversion="1.0.4" condition="lwIP Socket">
       <description>IoT Socket implementation with lwIP</description>
       <RTE_Components_h>
         <!-- the following content goes into file 'RTE_Components.h' -->
