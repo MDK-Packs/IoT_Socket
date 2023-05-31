@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Arm Limited. All rights reserved.
+ * Copyright (c) 2018-2023 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -15,11 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * $Date:        27. January 2020
- * $Revision:    V1.2.0
+ * $Date:        31. May 2023
+ * $Revision:    V2.0.0
  *
  * Project:      IoT Socket API definitions
  *
+ * Version 2.0.0
+ *   Added function iotSocketRecvMsg
+ *   Added function iotSocketSendMsg
+ *   Added function iotSocketSelect
+ *   Added socket options: IP_MULTICAST_IF,
+ *                         IP_MULTICAST_TTL,
+ *                         IP_ADD_MEMBERSHIP,
+ *                         IP_DROP_MEMBERSHIP,
+ *                         IP_PKTINFO,
+ *                         IPV6_MULTICAST_IF,
+ *                         IPV6_MULTICAST_HOPS,
+ *                         IPV6_ADD_MEMBERSHIP,
+ *                         IPV6_DROP_MEMBERSHIP,
+ *                         IPV6_PKTINFO
  * Version 1.2.0
  *   Extended iotSocketRecv/RecvFrom/Send/SendTo (support for polling)
  * Version 1.1.0
@@ -45,6 +59,7 @@ extern "C"
 #endif
 
 #include <stdint.h>
+#include <string.h>
 
 
 /**** Address Family definitions ****/
@@ -61,10 +76,55 @@ extern "C"
 
 /**** Socket Option definitions ****/
 #define IOT_SOCKET_IO_FIONBIO           1       ///< Non-blocking I/O (Set only, default = 0); opt_val = &nbio, opt_len = sizeof(nbio), nbio (integer): 0=blocking, non-blocking otherwise
-#define IOT_SOCKET_SO_RCVTIMEO          2       ///< Receive timeout in ms (default = 0); opt_val = &timeout, opt_len = sizeof(timeout)
-#define IOT_SOCKET_SO_SNDTIMEO          3       ///< Send timeout in ms (default = 0); opt_val = &timeout, opt_len = sizeof(timeout)
+#define IOT_SOCKET_SO_RCVTIMEO          2       ///< Receive timeout in ms (default = 0); opt_val = &timeout, opt_len = sizeof(timeout), timeout (integer)
+#define IOT_SOCKET_SO_SNDTIMEO          3       ///< Send timeout in ms (default = 0); opt_val = &timeout, opt_len = sizeof(timeout), timeout (integer)
 #define IOT_SOCKET_SO_KEEPALIVE         4       ///< Keep-alive messages (default = 0); opt_val = &keepalive, opt_len = sizeof(keepalive), keepalive (integer): 0=disabled, enabled otherwise
 #define IOT_SOCKET_SO_TYPE              5       ///< Socket Type (Get only); opt_val = &socket_type, opt_len = sizeof(socket_type), socket_type (integer): IOT_SOCKET_SOCK_xxx
+
+#define IOT_SOCKET_IP_MULTICAST_IF      6       ///< Network interface for sending multicast packets; opt_val = &interface, opt_len = sizeof(interface), interface (integer)
+#define IOT_SOCKET_IP_MULTICAST_TTL     7       ///< Time-to-live value of sent multicast packets (default = 1); opt_val = &ttl, opt_len = sizeof(ttl), ttl (integer): range 1 to 255
+#define IOT_SOCKET_IP_ADD_MEMBERSHIP    8       ///< Join a multicast group; opt_val = &group_info, opt_len = sizeof(group_info), group_info (iotSocket_ip_mreq structure)
+#define IOT_SOCKET_IP_DROP_MEMBERSHIP   9       ///< Leave a multicast group; opt_val = &group_info, opt_len = sizeof(group_info), group_info (iotSocket_ip_mreq structure)
+#define IOT_SOCKET_IP_PKTINFO           10      ///< Return packet information (default = 0); opt_val = &pkt_info, opt_len = sizeof(pkt_info), pkt_info (integer): 0=disabled, enabled otherwise
+
+#define IOT_SOCKET_IPV6_MULTICAST_IF    11      ///< Network interface for sending multicast packets for IPv6; opt_val = &interface, opt_len = sizeof(interface), interface (integer)
+#define IOT_SOCKET_IPV6_MULTICAST_HOPS  12      ///< Hop limit for sent multicast packets for IPv6 (default = 1); opt_val = &hop_limit, opt_len = sizeof (hop_limit), hop_limit (integer): range 1 to 255
+#define IOT_SOCKET_IPV6_ADD_MEMBERSHIP  13      ///< Join a multicast group for IPv6; opt_val = &group_info, opt_len = sizeof(group_info), group_info (iotSocket_ipv6_mreq structure)
+#define IOT_SOCKET_IPV6_DROP_MEMBERSHIP 14      ///< Leave a multicast group for IPv6; opt_val = &group_info, opt_len = sizeof(group_info), group_info (iotSocket_ipv6_mreq structure)
+#define IOT_SOCKET_IPV6_PKTINFO         15      ///< Return packet information for IPv6 (default = 0); opt_val = &pkt_info, opt_len = sizeof(pkt_info), pkt_info (integer): 0=disabled, enabled otherwise
+
+#define IOT_SOCKET_IPV6_JOIN_GROUP      IOT_SOCKET_IPV6_ADD_MEMBERSHIP
+#define IOT_SOCKET_IPV6_LEAVE_GROUP     IOT_SOCKET_IPV6_DROP_MEMBERSHIP
+
+/**** Message Header Flags ****/
+#define IOT_SOCKET_MSG_TRUNC            0x1     ///< Normal data was truncated
+#define IOT_SOCKET_MSG_CTRUNC           0x2     ///< Control data was truncated
+
+/**** Size of Socket set structure ****/
+#define IOT_SOCKET_FD_SETSIZE           64      ///< Maximum number of sockets in iotSocket_fd_set structure
+
+/**** Safe read/write Socket set macros ****/
+#define IOT_SOCKET_FD_WR(fd,code)           if ((fd >= 0) && (fd < IOT_SOCKET_FD_SETSIZE)) (code)
+#define IOT_SOCKET_FD_RD(fd,code)           (((fd >= 0) && (fd < IOT_SOCKET_FD_SETSIZE)) ? (code) : 0)
+
+/**** Macros to manipulate Socket set structure ****/
+#define IOT_SOCKET_FD_SET(fd,set)           IOT_SOCKET_FD_WR(fd, (set)->mask[(fd)>>5] |=  (1U << ((fd)&0x1F)))
+#define IOT_SOCKET_FD_CLR(fd,set)           IOT_SOCKET_FD_WR(fd, (set)->mask[(fd)>>5] &= ~(1U << ((fd)&0x1F)))
+#define IOT_SOCKET_FD_ISSET(fd,set)         IOT_SOCKET_FD_RD(fd, (set)->mask[(fd)>>5] &   (1U << ((fd)&0x1F)))
+#define IOT_SOCKET_FD_ZERO(set)             memset(set, 0, sizeof(*set))
+
+/**** Ancillary data access macros ****/
+#define IOT_SOCKET_CMSG_FIRSTHDR(mhdr)      ((mhdr)->control_len >= sizeof(iotSocket_cmsghdr) ? \
+                                             (iotSocket_cmsghdr *)(mhdr)->control             : \
+                                             (iotSocket_cmsghdr *)NULL)
+#define IOT_SOCKET_CMSG_DATA(cmsg)          ((uint8_t *)(cmsg) + sizeof(iotSocket_cmsghdr))
+#define IOT_SOCKET_CMSG_LEN(len)            (sizeof(iotSocket_cmsghdr) + len)
+#define IOT_SOCKET_CMSG_ALIGN(len)          (((len) + 3U) & ~3U)
+#define IOT_SOCKET_CMSG_SPACE(len)          (sizeof(iotSocket_cmsghdr) + IOT_CMSG_ALIGN(len))
+#define IOT_SOCKET_CMSG_NXTHDR(mhdr,cmsg)   (((uint32_t)(cmsg) + IOT_SOCKET_CMSG_ALIGN((cmsg)->len) + sizeof(iotSocket_cmsghdr)) > \
+                                             ((uint32_t)(mhdr)->control + (mhdr)->control_len)                                   ? \
+                                             (iotSocket_cmsghdr *)((uint32_t)(cmsg) + IOT_SOCKET_CMSG_ALIGN((cmsg)->len))        : \
+                                             (iotSocket_cmsghdr *)NULL)
 
 /**** Socket Return Codes ****/
 #define IOT_SOCKET_ERROR                (-1)    ///< Unspecified error
@@ -83,6 +143,40 @@ extern "C"
 #define IOT_SOCKET_EALREADY             (-14)   ///< Connection already in progress
 #define IOT_SOCKET_EADDRINUSE           (-15)   ///< Address in use
 #define IOT_SOCKET_EHOSTNOTFOUND        (-16)   ///< Host not found
+
+
+/**** Socket set structure ****/
+typedef struct {
+  uint32_t mask[(IOT_SOCKET_FD_SETSIZE+31)>>5]; ///< Set of sockets bit-mask
+} iotSocket_fd_set;
+
+/**** IPv4 Packet Information and Multicast Request structure ****/
+typedef struct {
+  uint32_t if_index;            ///< Interface index
+  uint8_t  ip_addr[4];          ///< IPv4 address
+} iotSocket_in_pktinfo, iotSocket_ip_mreq;
+
+/**** IPv6 Packet Information and Multicast Request structure ****/
+typedef struct {
+  uint32_t if_index;            ///< Interface index
+  uint8_t  ip_addr[16];         ///< IPv6 address
+} iotSocket_in6_pktinfo, iotSocket_ipv6_mreq;
+
+/**** Control Message Header structure ****/
+typedef struct {
+  uint32_t  len;                ///< Data byte count, including the iotSocket_cmsghdr
+  int32_t   id;                 ///< Identifier, protocol-specific type
+} iotSocket_cmsghdr;
+
+/**** Message Header structure ****/
+typedef struct {
+  uint8_t  *ip;                 ///< Pointer to remote IP address
+  uint16_t  ip_len;             ///< Length of 'ip' address in bytes
+  uint16_t  port;               ///< Remote port number
+  void     *control;            ///< Ancillary data
+  uint32_t  control_len;        ///< Ancillary data buffer length
+  int32_t   flags;              ///< Flags on received message
+} iotSocket_msghdr;
 
 
 /**
@@ -211,6 +305,25 @@ extern int32_t iotSocketRecv (int32_t socket, void *buf, uint32_t len);
 extern int32_t iotSocketRecvFrom (int32_t socket, void *buf, uint32_t len, uint8_t *ip, uint32_t *ip_len, uint16_t *port);
 
 /**
+  \brief         Receive message or check if data is available on a socket.
+  \param[in]     socket   socket identification number.
+  \param[out]    buf      pointer to buffer where data should be stored.
+  \param[in]     len      length of buffer (in bytes), set len = 0 to check if data is available.
+  \param[in,out] message  pointer to structure with message header information.
+  \return        status information:
+                 - number of bytes received (>=0), if len != 0.
+                 - 0                             = Data is available (len = 0).
+                 - \ref IOT_SOCKET_ESOCK         = Invalid socket.
+                 - \ref IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer, length or message).
+                 - \ref IOT_SOCKET_ENOTCONN      = Socket is not connected.
+                 - \ref IOT_SOCKET_ECONNRESET    = Connection reset by the peer.
+                 - \ref IOT_SOCKET_ECONNABORTED  = Connection aborted locally.
+                 - \ref IOT_SOCKET_EAGAIN        = Operation would block or timed out (may be called again).
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
+ */
+extern int32_t iotSocketRecvMsg (int32_t socket, void *buf, uint32_t len, iotSocket_msghdr *message);
+
+/**
   \brief         Send data or check if data can be sent on a connected socket.
   \param[in]     socket   socket identification number.
   \param[in]     buf      pointer to buffer containing data to send.
@@ -248,6 +361,25 @@ extern int32_t iotSocketSend (int32_t socket, const void *buf, uint32_t len);
                  - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketSendTo (int32_t socket, const void *buf, uint32_t len, const uint8_t *ip, uint32_t ip_len, uint16_t port);
+
+/**
+  \brief         Send message or check if data can be sent on a socket.
+  \param[in]     socket   socket identification number.
+  \param[in]     buf      pointer to buffer containing data to send.
+  \param[in]     len      length of data (in bytes), set len = 0 to check if data can be sent.
+  \param[in]     message  pointer to structure with message header information.
+  \return        status information:
+                 - number of bytes sent (>=0), if len != 0.
+                 - 0                             = Data can be sent (len = 0).
+                 - \ref IOT_SOCKET_ESOCK         = Invalid socket.
+                 - \ref IOT_SOCKET_EINVAL        = Invalid argument (pointer to buffer, length or message).
+                 - \ref IOT_SOCKET_ENOTCONN      = Socket is not connected.
+                 - \ref IOT_SOCKET_ECONNRESET    = Connection reset by the peer.
+                 - \ref IOT_SOCKET_ECONNABORTED  = Connection aborted locally.
+                 - \ref IOT_SOCKET_EAGAIN        = Operation would block or timed out (may be called again).
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
+ */
+extern int32_t iotSocketSendMsg (int32_t socket, const void *buf, uint32_t len, const iotSocket_msghdr *message);
 
 /**
   \brief         Retrieve local IP address and port of a socket.
@@ -324,6 +456,24 @@ extern int32_t iotSocketSetOpt (int32_t socket, int32_t opt_id, const void *opt_
                  - \ref IOT_SOCKET_ERROR         = Unspecified error.
  */
 extern int32_t iotSocketClose (int32_t socket);
+
+/**
+  \brief         Block until a socket in one of the masks is signalled or timeout happens.
+  \param[in,out] readfds    pointer to the set of sockets to check for read.
+                            - NULL for none.
+  \param[in,out] writefds   pointer to the set of sockets to check for write.
+                            - NULL for none.
+  \param[in,out] exceptfds  pointer to the set of sockets to check for exceptional conditions (errors).
+                            - NULL for none.
+  \param[in]     timeout_ms maximum time for iotSocketSelect to wait.
+  \return        status information:
+                 - number of ready sockets (>0)
+                 - 0                             = Operation timed out.
+                 - \ref IOT_SOCKET_EINVAL        = Invalid argument.
+                 - \ref IOT_SOCKET_ENOTSUP       = Operation not supported.
+                 - \ref IOT_SOCKET_ERROR         = Unspecified error.
+ */
+extern int32_t iotSocketSelect (iotSocket_fd_set *readfds, iotSocket_fd_set *writefds, iotSocket_fd_set *exceptfds, uint32_t timeout_ms);
 
 /**
   \brief         Retrieve host IP address from host name.
