@@ -60,6 +60,82 @@
 \details Enables or disables the keep-alive mode for the stream socket.
 \def IOT_SOCKET_SO_TYPE
 \details Obtains the type of the socket.
+\def IOT_SOCKET_IP_MULTICAST_IF
+\details Specifies the default interface for sending multicast packets.
+\def IOT_SOCKET_IP_MULTICAST_TTL
+\details Specifies the time-to-live value of sending multicast packets.
+\def IOT_SOCKET_IP_ADD_MEMBERSHIP
+\details Specifies a multicast group to join.
+\def IOT_SOCKET_IP_DROP_MEMBERSHIP
+\details Specifies a multicast group to leave.
+\def IOT_SOCKET_IP_PKTINFO
+\details Enables or disables the extended packet information for received datagram messages received by \ref iotSocketRecvMsg.
+\def IOT_SOCKET_IPV6_MULTICAST_IF
+\details Specifies the interface for sending multicast packets for IP version 6.
+\def IOT_SOCKET_IPV6_MULTICAST_HOPS
+\details Specifies the multicast hop limit for IP version 6.
+\def IOT_SOCKET_IPV6_ADD_MEMBERSHIP
+\details Specifies a multicast group to join for IP version 6.
+\def IOT_SOCKET_IPV6_DROP_MEMBERSHIP
+\details Specifies a multicast group to leave for IP version 6.
+\def IOT_SOCKET_IPV6_PKTINFO
+\details Enables or disables the extended packet information for received datagram messages received by \ref iotSocketRecvMsg
+for IP version 6.
+@}
+*/
+
+/**
+\defgroup iotSocketMessageFlags  IoT Socket Message Flags
+\brief Socket Message Flags definitions.
+\details The Socket Message Flags specify the flags for receive message function \ref iotSocketRecvMsg.
+@{
+\def IOT_SOCKET_MSG_TRUNC
+\details Message data was truncated because it was larger than the supplied buffer. The trailing part of a datagram was discarded.
+\def IOT_SOCKET_MSG_CTRUNC
+\details Some control data were discarded due to lack of space in the buffer for ancillary data.
+@}
+*/
+
+/**
+\defgroup iotSocketSetManipulating  IoT Socket Set Manipulation
+\brief Set of sockets manipulation and control.
+\details These macros are used to manipulate and control a set of socket descriptors. Socket descriptors are assumed to be in
+the range \token{0} to \ref IOT_SOCKET_FD_SETSIZE. If the network stack returns different socket descriptors, the descriptors
+must be converted to socket IDs in that range, or the socket set manipulation will not work.
+@{
+\def IOT_SOCKET_FD_SETSIZE
+\details This macro specifies the maximum number of bits in an \ref iotSocket_fd_set structure.
+\def IOT_SOCKET_FD_SET
+\details This macro sets the bit for the socket \a fd in the set of sockets specified with \a set.
+\def IOT_SOCKET_FD_CLR
+\details This macro clears the bit for the socket \a fd in the set of sockets specified with \a set.
+\def IOT_SOCKET_FD_ISSET
+\details This macro checks the state of the bit for the socket \a fd in the set of sockets specified with \a set.
+Returns a nonzero value if bit is set, and \token{0} otherwise.
+\def IOT_SOCKET_FD_ZERO
+\details This macro initialises the set of sockets specified with \a set to have zero bits for all socket descriptors.
+@}
+*/
+
+/**
+\defgroup iotSocketCmsgAccess  IoT Socket Ancillary Data Access
+\brief Access to ancillary data of a socket message.
+\details These macros are used to access the control message of a received message.
+@{
+\def IOT_SOCKET_CMSG_FIRSTHDR
+\details This macro returns the first control message attached to the message \a mhdr. If no control messages are attached,
+the macro returns \token{NULL}.
+\def IOT_SOCKET_CMSG_NXTHDR
+\details This macro returns the location of the control message following \a cmsg in the message \a mhdr.
+\def IOT_SOCKET_CMSG_DATA
+\details This macro accesses the data portion of the control message header \a cmsg.
+\def IOT_SOCKET_CMSG_LEN
+\details This macro determines the size of a control message in bytes, which includes the control message header.
+\def IOT_SOCKET_CMSG_ALIGN
+\details This macro aligns the length \a len to multiple of four bytes.
+\def IOT_SOCKET_CMSG_SPACE
+\details This macro determines the size needed to hold a control message and its contents of length \a len, which
+includes the control message header.
 @}
 */
 
@@ -93,6 +169,56 @@ code is less than \token{0}.
 @}
 */
 
+
+/**
+\defgroup iotSocketStructures IoT Socket Structures
+\brief List of IoT Socket structures
+\details
+*/
+
+/**
+\addtogroup iotSocketStructures
+@{
+*/
+
+/**
+@{
+\struct iotSocket_fd_set
+\details The \ref iotSocket_fd_set structure specifies socket sets for the \ref iotSocketSelect function. Each
+bit in the array represent one socket. Maximum number of sockets is limited to \ref IOT_SOCKET_FD_SETSIZE size.
+
+\struct iotSocket_in_pktinfo
+\details The iotSocket_in_pktinfo structure is used to store received packet address information. It is used
+to return information about received packets and also allows specifying the local IPv4 address to use for
+sending packets.
+
+\struct iotSocket_ip_mreq
+\details The iotSocket_ip_mreq structure provides multicast group information for IPv4 addresses.
+It is identical to \ref iotSocket_in_pktinfo structure.
+
+\struct iotSocket_in6_pktinfo
+\details  The iotSocket_in6_pktinfo structure is used to store received packet address information. It is used
+to return information about received packets and also allows specifying the local IPv6 address to use for
+sending packets.
+
+\struct iotSocket_ipv6_mreq
+\details The iotSocket_ipv6_mreq structure provides multicast group information for IPv6 addresses.
+It is identical to \ref iotSocket_in6_pktinfo structure.
+
+\struct iotSocket_cmsghdr
+\details The iotSocket_cmsghdr structure defines the header for a control data object that is associated
+with a datagram and is made up of one or more control data objects. Each object begins with an iotSocket_cmsghdr
+structure.
+
+\struct iotSocket_msghdr
+\details The iotSocket_msghdr structure is used to store address and optional control information about
+the datagram socket. The structure is used in \ref iotSocketRecvMsg and \ref iotSocketSendMsg functions.
+@}
+*/
+
+/**
+@}
+*/
 
 /**
 \defgroup iotSocketAPI  IoT Socket Functions
@@ -254,7 +380,7 @@ The argument \em ip is a pointer to the buffer containing the IP address octets 
 The argument \em ip_len specifies the length of the IP address. The length is \token{4} bytes
 for the IPv4 address and \token{16} bytes for the IPv6 address.
 
-The argument \em port specifies the port of the endpoint node. If the argument \em port is \token{0}, 
+The argument \em port specifies the port of the endpoint node. If the argument \em port is \token{0},
 the function returns error, because this port is reserved.
 
 \b Example:
@@ -301,7 +427,7 @@ You can use this function with both, the stream and the datagram socket. It read
 information as currently available up to the size of the buffer specified.
 
 In blocking mode, which is enabled by default, this function waits for received data. In non
-blocking mode, you must call the \b iotSocketRecv function again if the error code 
+blocking mode, you must call the \b iotSocketRecv function again if the error code
 \c IOT_SOCKET_EAGAIN is returned.
 
 The argument \em socket specifies a socket identification number returned from a previous call
@@ -315,7 +441,7 @@ so the application can retrieve all data by multiple calls of \b iotSocketRecv f
 The argument \em len specifies the size of the application data buffer.
 
 \note
-The function can also be used to check if the socket has data available to read by specifying 
+The function can also be used to check if the socket has data available to read by specifying
 \token{0} for argument \em len (argument \em buf is ignored).
 The function returns \token{0} if data is available or error code otherwise.
 In blocking mode, the function waits until data is available, in non blocking mode the function returns instantly.
@@ -334,7 +460,7 @@ ordered stream of data on a connected stream sockets. It reads as much informati
 up to the size of the buffer specified.
 
 In blocking mode, which is enabled by default, this function waits for received data. In non
-blocking mode, you must call the \b iotSocketRecv function again if the error code 
+blocking mode, you must call the \b iotSocketRecv function again if the error code
 \c IOT_SOCKET_EAGAIN is returned.
 
 The argument \em socket specifies a socket identification number returned from a previous call
@@ -357,7 +483,7 @@ The argument \em port is a pointer to the buffer, that will receive the port num
 If the \em port is \token{NULL}, the port number is not returned.
 
 \note
-The function can also be used to check if the socket has data available to read by specifying 
+The function can also be used to check if the socket has data available to read by specifying
 \token{0} for argument \em len (arguments \em buf, \em ip, \em ip_len and \em port are ignored).
 The function returns \token{0} if data is available or error code otherwise.
 In blocking mode, the function waits until data is available, in non blocking mode the function returns instantly.
@@ -400,6 +526,92 @@ void Echo_Server_Thread (void *arg) {
 */
 
 /**
+\fn int32_t iotSocketRecvMsg (int32_t socket, void *buf, uint32_t len, iotSocket_msghdr *message)
+\details
+The function \b iotSocketRecvMsg is used to receive a message from a datagram socket. It allows
+the application to obtain the source and destination address of the received data.
+
+In blocking mode, which is enabled by default, this function waits for received data. In non blocking mode,
+you must call the \b iotSocketRecvMsg function again if the error code \c IOT_SOCKET_EAGAIN is returned.
+
+The argument \em socket specifies a socket descriptor returned from a previous call to \ref iotSocketCreate.
+
+The argument \em buf is a pointer to the application data buffer for storing the data to.
+If the available data is too large to fit in the supplied application buffer \em buf, excess bytes are discarded.
+
+The argument \em len specifies the size of the application data buffer.
+
+The argument \em message is a pointer to the \b iotSocket_msghdr structure, containing both the buffer to
+store the source address and optionally the destination address, which is stored as ancillary data.
+
+- The \em ip member is a pointer to the buffer that will receive the IP address of the sender. If the \em ip
+is \token{NULL}, the IP address is not returned.
+
+- The \em ip_len member is the address length. It should initially contain the amount of space pointed to
+by \em ip. On return it contains the actual length of the address returned in bytes.
+
+- The \em port member will receive the port number of the sender.
+
+- The \em control member is a pointer to a buffer, that will receive ancillary data.
+
+- The \em control_len member is the buffer length. It should initially contain the amount of space pointed to by
+\em control. On return it contains the actual length of the control data returned in bytes.
+
+- The \em flags member is ignored on input, but may contain meaningful values on output:
+|Flag                           |Description|
+|-------------------------------|-----------|
+|\token{IOT_SOCKET_MSG_TRUNC}   |Normal data was truncated, excess bytes are discarded. |
+|\token{IOT_SOCKET_MSG_CTRUNC}  |Control data was truncated, ancillary data buffer is too small. |
+
+The control data can be processed with the following macros:
+
+|Macro name                       |Description                 |
+|---------------------------------|----------------------------|
+|IOT_SOCKET_CMSG_FIRSTHDR(mhdr)   |Returns a pointer to the first iotSocket_cmsghdr structure in the \a mhdr.|
+|IOT_SOCKET_CMSG_NXTHDR(mhdr,cmsg)|Returns a pointer to the iotSocket_cmsghdr structure describing the next ancillary data object.|
+|IOT_SOCKET_CMSG_DATA(cmsg)       |Returns a pointer to the data of ancillary data object.|
+|IOT_SOCKET_CMSG_ALIGN(len)       |Rounds the argument up to the next even multiple of 4 bytes.|
+|IOT_SOCKET_CMSG_LEN(len)         |Gives the length of an ancillary data object without padding.|
+|IOT_SOCKET_CMSG_SPACE(len)       |Gives the length of an ancillary data object including the padding needed.|
+
+\b Example:
+\code
+static uint8_t  buf[1500];      // Receive buffer
+static uint8_t  ip_src[4];      // Source IP address
+static uint8_t  ip_dst[4];      // Destination IP address
+static uint32_t if_index;       // Interface index
+ 
+static void receive_message (int32_t sock) {
+  iotSocket_msghdr      msg;
+  iotSocket_cmsghdr    *cmsg;
+  iotSocket_in_pktinfo *pktinfo;
+  uint8_t cmsg_buf[32];
+  int32_t len, enable;
+ 
+  enable = 1;
+  iotSocketSetOpt (sock, IOT_SOCKET_IP_PKTINFO, &enable, sizeof(enable));
+ 
+  msg.ip          = ip_src;
+  msg.ip_len      = sizeof(ip_src);
+  msg.control     = cmsg_buf;
+  msg.control_len = sizeof(cmsg_buf);
+ 
+  len = iotSocketRecvMsg (sock, buf, sizeof(buf), &msg);
+  if (len > 0) {
+    for (cmsg = IOT_SOCKET_CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = IOT_SOCKET_CMSG_NXTHDR(&msg,cmsg)) {
+      if (cmsg->id == IOT_SOCKET_IP_PKTINFO) {
+        pktinfo = (iotSocket_in_pktinfo *)IOT_SOCKET_CMSG_DATA(cmsg);
+        if_index = pktinfo->if_index;
+        memcpy (ip_dst, pktinfo->ip_addr, 4);
+        break;
+      }
+    }
+  }
+}
+\endcode
+*/
+
+/**
 \fn int32_t iotSocketSend (int32_t socket, const void *buf, uint32_t len)
 \details
 The function \b iotSocketSend is used to send data on an already connected socket.
@@ -421,7 +633,7 @@ The argument \a len specifies the length of data in bytes.
 Return value, when positive, represents the number of bytes sent, which can be less than \a len.
 
 \note
-The function can also be used to check if the socket is ready to send data by specifying \token{0} 
+The function can also be used to check if the socket is ready to send data by specifying \token{0}
 for argument \em len (argument \em buf is ignored).
 The function returns \token{0} if the socket is writable or error code otherwise.
 
@@ -432,7 +644,7 @@ The function returns \token{0} if the socket is writable or error code otherwise
 /**
 \fn int32_t iotSocketSendTo (int32_t socket, const void *buf, uint32_t len, const uint8_t *ip, uint32_t ip_len, uint16_t port)
 \details
-The function \b iotSocketSendTo is used to send data. 
+The function \b iotSocketSendTo is used to send data.
 
 It is normally used to send messages on a datagram sockets, but can also be used to send data on a connected stream sockets.
 
@@ -454,7 +666,7 @@ The argument \em ip is a pointer to the buffer containing the IP address octets 
 The argument \em ip_len specifies the length of the IP address. The length is \token{4} bytes
 for the IPv4 address and \token{16} bytes for the IPv6 address.
 
-The argument \em port specifies the port of the endpoint node. If the argument \em port is \token{0}, 
+The argument \em port specifies the port of the endpoint node. If the argument \em port is \token{0},
 the function returns error, because this port is reserved.
 
 For the stream sockets, arguments \em ip, \em ip_len and \em port are ignored.
@@ -462,12 +674,79 @@ For the stream sockets, arguments \em ip, \em ip_len and \em port are ignored.
 Return value, when positive, represents the number of bytes sent, which can be less than \a len.
 
 \note
-The function can also be used to check if the socket is ready to send data by specifying \token{0} 
+The function can also be used to check if the socket is ready to send data by specifying \token{0}
 for argument \em len (arguments \em buf, \em ip, \em ip_len and \em port are ignored).
 The function returns \token{0} if the socket is writable or error code otherwise.
 
 \b Example:
  - see \ref iotSocketRecvFrom
+*/
+
+/**
+\fn int32_t iotSocketSendMsg (int32_t socket, const void *buf, uint32_t len, const iotSocket_msghdr *message)
+\details
+The function \b iotSocketSendMsg is used to send a message on a datagram socket. It allows the application to
+specify the source and destination address where the message is to be sent to.
+
+The argument \em socket specifies a socket descriptor returned from a previous call to \ref iotSocketCreate.
+
+The argument \em buf is a pointer to the application data buffer containing data to transmit. The buffer
+data length is not limited in size. If the data length is too large for one packet, the \b iotSocketSendMsg function
+will fragment the data and send it in several successive data packets:
+- In blocking mode, which is enabled by default, this function returns after the data has been successfully queued for transmission.
+- In non blocking mode, the function returns immediately without blocking the system.
+
+The argument \em len specifies the length of data in bytes.
+
+The argument \em message is a pointer to the \b iotSocket_msghdr structure, containing both the destination address and
+optionally buffers with ancillary data.
+
+- The \em ip member is a pointer to the buffer that contains the IP address of the endpoint node.
+If \em ip is \token{NULL}, the destination address specified with a call to \ref iotSocketConnect function is used.
+
+- The \em ip_len member is the address length.
+
+- The \em port member is the destination port number.
+
+- The \em control member is a pointer to a buffer, that contains the ancillary data.
+
+- The \em control_len member is the ancillary data length.
+
+- The \em flags member is ignored.
+
+\b Example:
+\code
+static char buf[120]     = { "Message content to send" };
+static uint8_t ip_src[4] = { 192, 168, 0, 100 }; // Source IP address
+static uint8_t ip_dst[4] = { 224, 0, 0, 10 };    // Destination IP address
+static uint32_t if_index = 0;                    // Interface index
+ 
+static void send_message (int32_t sock) {
+  iotSocket_msghdr      msg;
+  iotSocket_cmsghdr    *cmsg;
+  iotSocket_in_pktinfo *pktinfo;
+  uint8_t cmsg_buf[32];
+  int32_t len;
+ 
+  cmsg = (iotSocket_cmsghdr *)cmsg_buf;
+  cmsg->len = IOT_SOCKET_CMSG_LEN(4);
+  cmsg->id  = IOT_SOCKET_IP_PKTINFO;
+  pktinfo = (iotSocket_in_pktinfo *)IOT_SOCKET_CMSG_DATA(cmsg);
+  pktinfo->if_index = if_index;
+  memcpy (pktinfo->ip_addr, ip_src, 4);
+ 
+  memcpy (msg.ip, ip_dst, 4);
+  msg.port        = 5540;
+  msg.ip_len      = 4;
+  msg.control     = cmsg;
+  msg.control_len = cmsg->len;
+ 
+  len = iotSocketSendMsg (sock, buf, sizeof(buf), &msg);
+  if (len <= 0) {
+    // Error
+  }
+}
+\endcode
 */
 
 /**
@@ -579,12 +858,22 @@ to \ref iotSocketCreate.
 
 The argument \em opt_id is the socket option for which the value is to be set. The following
 socket options are supported:
-Option                       | Type    | Description
-:----------------------------|:--------|:-------------------------------------------------
-\ref IOT_SOCKET_IO_FIONBIO   | int32_t | Non-blocking mode for the socket
-\ref IOT_SOCKET_SO_RCVTIMEO  | int32_t | Timeout for receiving in blocking mode
-\ref IOT_SOCKET_SO_SNDTIMEO  | int32_t | Timeout for sending in blocking mode
-\ref IOT_SOCKET_SO_KEEPALIVE | int32_t | Keep-alive mode for the stream socket
+Option                               | Type                | Description
+:------------------------------------|:--------------------|:-------------------------------------------------
+\ref IOT_SOCKET_IO_FIONBIO           | int32_t             | Non-blocking mode for the socket
+\ref IOT_SOCKET_SO_RCVTIMEO          | int32_t             | Timeout for receiving in blocking mode
+\ref IOT_SOCKET_SO_SNDTIMEO          | int32_t             | Timeout for sending in blocking mode
+\ref IOT_SOCKET_SO_KEEPALIVE         | int32_t             | Keep-alive mode for the stream socket
+\ref IOT_SOCKET_IP_MULTICAST_IF      | int32_t             | Network interface for sending multicast packets
+\ref IOT_SOCKET_IP_MULTICAST_TTL     | int32_t             | Time-to-live value of sending multicast packets
+\ref IOT_SOCKET_IP_ADD_MEMBERSHIP    | iotSocket_ip_mreq   | Join a multicast group
+\ref IOT_SOCKET_IP_DROP_MEMBERSHIP   | iotSocket_ip_mreq   | Leave a multicast group
+\ref IOT_SOCKET_IP_PKTINFO           | int32_t             | Return packet information (destination IP address)
+\ref IOT_SOCKET_IPV6_MULTICAST_IF    | int32_t             | Network interface for sending multicast packets
+\ref IOT_SOCKET_IPV6_MULTICAST_HOPS  | int32_t             | Hop limit for sending multicast packets
+\ref IOT_SOCKET_IPV6_ADD_MEMBERSHIP  | iotSocket_ipv6_mreq | Join a multicast group
+\ref IOT_SOCKET_IPV6_DROP_MEMBERSHIP | iotSocket_ipv6_mreq | Leave a multicast group
+\ref IOT_SOCKET_IPV6_PKTINFO         | int32_t             | Return packet information (destination IPv6 address)
 
 The argument \em opt_val points to the buffer containing the value of the \em opt_id.
 
@@ -598,6 +887,12 @@ uint32_t timeout = 10000U;    // Timeout 10 seconds
 iotSocketSetOpt (sock, IOT_SOCKET_IO_FIONBIO, &nonblocking, sizeof(nonblocking));
 iotSocketSetOpt (sock, IOT_SOCKET_SO_RCVTIMEO, &timeout, sizeof(timeout));
 iotSocketSetOpt (sock, IOT_SOCKET_SO_SNDTIMEO, &timeout, sizeof(timeout));
+ 
+// Multicast address 224.0.0.10
+iotSocket_ip_mreq group = { 0, { 224, 0, 0, 10 } };
+ 
+iotSocketSetOpt (sock, IOT_SOCKET_IP_ADD_MEMBERSHIP, &group, sizeof(group));
+iotSocketSetOpt (sock, IOT_SOCKET_IP_DROP_MEMBERSHIP,&group, sizeof(group));
 \endcode
 */
 
@@ -616,6 +911,84 @@ In non blocking mode, you must call the \b iotSocketClose function again if the 
 
 \b Example:
  - see \ref iotSocketListen
+*/
+
+/**
+\fn int32_t iotSocketSelect (iotSocket_fd_set *readfds, iotSocket_fd_set *writefds, iotSocket_fd_set *exceptfds, uint32_t timeout_ms)
+\details
+The function \b iotSocketSelect indicates which of the specified sockets is ready for reading,
+ready for writing, or has an error condition pending. If the specified condition is false for all of
+the specified sockets, \b iotSocketSelect blocks, up to the specified timeout interval, until the specified
+condition is true for at least one of the specified sockets.
+
+The argument \em readfds specifies the set of sockets to be checked for being ready to read on input,
+and on output indicates which sockets are ready to read. If the value of \em readfds is \token{NULL},
+the sockets are not checked for being ready to read.
+
+The argument \em writefds specifies the set of sockets to be checked for being ready to write on input,
+and on output indicates which sockets are ready to write. If the value of \em writefds is \token{NULL},
+the sockets are not checked for being ready to write.
+
+The argument \em exceptfds specifies the set of sockets to be checked for error conditions pending on input,
+and on output indicates which sockets have error condition pending. If the value of \em errorfds is \token{NULL},
+the sockets are not checked for error condition pending.
+
+On exit, each set of sockets is modified in place to indicate which sockets actually changed status. Thus,
+if using \b iotSocketSelect within a loop, the sets must be reinitialized before each call.
+
+The argument \em timeout_ms specifies a maximum interval to wait for the selection to complete, specified
+in milliseconds. If the \em timeout_ms is \token{0}, \b iotSocketSelect function does not block.
+
+The set of sockets of type \ref iotSocket_fd_set can be initialized and tested with the following macros:
+
+|Macro name                  |Description                 |
+|----------------------------|----------------------------|
+|IOT_SOCKET_FD_SET(fd, set)  |Sets the bit for the socket \a fd in the set of sockets specified with \a set.|
+|IOT_SOCKET_FD_CLR(fd, set)  |Clears the bit for the socket \a fd in the set of sockets specified with \a set.|
+|IOT_SOCKET_FD_ISSET(fd, set)|Returns a nonzero value if the bit for the socket \a fd is set in the set of sockets specified with \a set, and \token{0} otherwise.|
+|IOT_SOCKET_FD_ZERO(set)     |Initialises the set of sockets \a set to have zero bits for all socket descriptors.|
+
+\b Example:
+\code
+  uint8_t  ip[4];
+  int32_t  sock, res;
+  uint32_t ip_len;
+  uint16_t port;
+  iotSocket_fd_set fds;
+  char buff[120];
+ 
+  sock = iotSocketCreate (IOT_SOCKET_AF_INET, IOT_SOCKET_SOCK_DGRAM, IOT_SOCKET_IPPROTO_UDP);
+ 
+  ip[0] = 0U;                   // Unspecified address
+  ip[1] = 0U;
+  ip[2] = 0U;
+  ip[3] = 0U;
+  port  = 7U;                   // Standard port for Echo service
+ 
+  iotSocketBind (sock, (uint8_t *)ip, sizeof(ip), port);
+ 
+  while (1) {
+    IOT_SOCKET_FD_ZERO(&fds);
+    IOT_SOCKET_FD_SET(sock, &fds);
+ 
+    // Wait for the packet
+    res = iotSocketSelect (&fds, NULL, NULL, 120U*1000U);
+    if (res > 0) {
+      if (IOT_SOCKET_FD_ISSET(sock, &fds)) {
+        // Data ready, iotSocketRecvFrom will not block
+        ip_len = sizeof (ip);
+        res = iotSocketRecvFrom (sock, buff, sizeof(buff), (uint8_t *)ip, &ip_len, &port);
+        if (res < 0) {
+          break;                // Error occurred
+        }
+        if (res > 0) {          // Echo the data
+          iotSocketSendTo (sock, buff, res, (uint8_t *)ip, ip_len, port);
+        }
+      }
+    }
+  }
+  iotSocketClose (sock);
+\endcode
 */
 
 /**
