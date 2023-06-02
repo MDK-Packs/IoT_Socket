@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package schemaVersion="1.6" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="PACK.xsd">
+<package schemaVersion="1.7.7" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.7/schema/PACK.xsd">
   <vendor>MDK-Packs</vendor>
   <name>IoT_Socket</name>
   <description>Simple IP Socket (BSD like)</description>
@@ -8,6 +8,11 @@
   <license>LICENSE.txt</license>
   <repository type="git">https://github.com/MDK-Packs/IoT_Socket.git</repository>
   <releases>
+    <release version="2.0.0">
+      Updated IoT Socket API V2.0.0:
+      - added functions iotSocketRecvMsg, iotSocketSendMsg and iotSocketSelect
+      - added socket options for Multicast support
+    </release>
     <release version="1.3.1">
       Updated IoT Socket implementation with lwIP:
       - corrected iotSocketGetOpt/iotSocketSetOpt timeout options
@@ -43,7 +48,7 @@
     </release>
   </releases>
   <apis>
-    <api Cclass="IoT Utility" Cgroup="Socket" Capiversion="1.2.0" exclusive="1">
+    <api Cclass="IoT Utility" Cgroup="Socket" Capiversion="2.0.0" exclusive="1">
       <description>Simple IP Socket interface</description>
       <files>
         <file category="doc"    name="documentation/index.html"/>
