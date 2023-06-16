@@ -184,33 +184,40 @@ code is less than \token{0}.
 /**
 @{
 \struct iotSocket_fd_set
+\brief Socket set structure.
 \details The \ref iotSocket_fd_set structure specifies socket sets for the \ref iotSocketSelect function. Each
 bit in the array represent one socket. Maximum number of sockets is limited to \ref IOT_SOCKET_FD_SETSIZE size.
 
 \struct iotSocket_in_pktinfo
+\brief IPv4 Packet Information structure.
 \details The iotSocket_in_pktinfo structure is used to store received packet address information. It is used
 to return information about received packets and also allows specifying the local IPv4 address to use for
 sending packets.
 
 \struct iotSocket_ip_mreq
+\brief IPv4 Multicast Request structure.
 \details The iotSocket_ip_mreq structure provides multicast group information for IPv4 addresses.
 It is identical to \ref iotSocket_in_pktinfo structure.
 
 \struct iotSocket_in6_pktinfo
+\brief IPv6 Packet Information structure.
 \details  The iotSocket_in6_pktinfo structure is used to store received packet address information. It is used
 to return information about received packets and also allows specifying the local IPv6 address to use for
 sending packets.
 
 \struct iotSocket_ipv6_mreq
+\brief IPv6 Multicast Request structure.
 \details The iotSocket_ipv6_mreq structure provides multicast group information for IPv6 addresses.
 It is identical to \ref iotSocket_in6_pktinfo structure.
 
 \struct iotSocket_cmsghdr
+\brief Control Message Header structure.
 \details The iotSocket_cmsghdr structure defines the header for a control data object that is associated
 with a datagram and is made up of one or more control data objects. Each object begins with an iotSocket_cmsghdr
 structure.
 
 \struct iotSocket_msghdr
+\brief Message Header structure.
 \details The iotSocket_msghdr structure is used to store address and optional control information about
 the datagram socket. The structure is used in \ref iotSocketRecvMsg and \ref iotSocketSendMsg functions.
 @}
