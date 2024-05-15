@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package schemaVersion="1.7.7" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.7/schema/PACK.xsd">
+<package schemaVersion="1.7.36" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.36/schema/PACK.xsd">
   <vendor>MDK-Packs</vendor>
   <name>IoT_Socket</name>
   <description>Simple IP Socket (BSD like)</description>
   <!-- web download link -->
   <url>https://github.com/MDK-Packs/Pack/raw/master/IoT_Socket/</url>
   <license>LICENSE.txt</license>
+  <licenseSets>
+    <licenseSet id="all" default="true" gating="true">
+      <license name="LICENSE.txt" title="Apache 2.0 open-source license" spdx="Apache-2.0"/>
+    </licenseSet>
+  </licenseSets>
   <repository type="git">https://github.com/MDK-Packs/IoT_Socket.git</repository>
   <releases>
     <release version="2.0.0">
