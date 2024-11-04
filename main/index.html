@@ -159,7 +159,35 @@ Examples</h1>
 <img src="iot_examples.png" alt=""/>
 <div class="caption">
 Examples of IoT applications</div></div>
-    <h1><a class="anchor" id="license"></a>
+    <h1><a class="anchor" id="limits"></a>
+Limitations</h1>
+<p>The table below lists the differences that IoT socket has comparing to BSD socket capabilities.</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Functionality   </th><th class="markdownTableHeadNone">Support in IoT Socket   </th><th class="markdownTableHeadNone">Support in BSD Socket    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Address family   </td><td class="markdownTableBodyNone">Only IPv4 and optionally IPv6, see <a class="el" href="group__iotSocketAddressFamily.html">IoT Socket Address Family</a>.   </td><td class="markdownTableBodyNone">Many other address families.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Socket type   </td><td class="markdownTableBodyNone">Only STREAM and DGRAM, see <a class="el" href="group__iotSocketType.html">IoT Socket Type</a>.   </td><td class="markdownTableBodyNone">Many other socket types.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Socket protocol   </td><td class="markdownTableBodyNone">Only TCP and UDP, see <a class="el" href="group__iotSocketProtocol.html">IoT Socket Protocol</a>.   </td><td class="markdownTableBodyNone">Many other protocols.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Socket options   </td><td class="markdownTableBodyNone">Only reduced set, see <a class="el" href="group__iotSocketOptions.html">IoT Socket Options</a>.   </td><td class="markdownTableBodyNone">Many other socket options.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Address representation   </td><td class="markdownTableBodyNone">Uses pointer to array of bytes, 4-bytes for IPv4, 16-bytes for IPv6, length is supplied with "ip_len" parameter. Port number is specified in host byte order Little Endian (LE).   </td><td class="markdownTableBodyNone">Uses structure "sockaddr" that contains address family, IP address and port number. IP address and port number are specified in network byte order Big Endian (BE).    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Errors   </td><td class="markdownTableBodyNone">Returns error code as specified in <a class="el" href="group__iotSocketReturnCodes.html">IoT Socket Return Codes</a>.   </td><td class="markdownTableBodyNone">Returns -1 and sets the global "errno" on failure.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Host name resolving   </td><td class="markdownTableBodyNone">Function <a class="el" href="group__iotSocketAPI.html#ga1f60dda886640137dead0622fdff9a5e">iotSocketGetHostByName</a> retrieves IPv4 or IPv6 address, requested address family is specified in "af" parameter.   </td><td class="markdownTableBodyNone">Function "gethostbyname" retrieves only IPv4 addresses. The API function "getaddrinfo" is used to retrieve IPv4 or IPv6 addresses.    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Read/write ability check<sup>1</sup>   </td><td class="markdownTableBodyNone">Uses receive functions called with parameter len=0. The function returns 0 if the socket is readable or writeable, otherwise the error code. There is no "select" function available.   </td><td class="markdownTableBodyNone">Uses "select" function with a 0-timeout to check if the socket is readable or writeable.    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Address conversion   </td><td class="markdownTableBodyNone">APIs have no address conversion functions between ASCII (dot format) and network format.   </td><td class="markdownTableBodyNone">Supports address conversion between ASCII and network format: "inet_addr", "inet_aton", "inet_ntoa", "inet_pton", "inet_ntop"   </td></tr>
+</table>
+<blockquote class="doxtable">
+<p>&zwj;<sup>1</sup> Readable/writeable socket would not block on a send/receive call. </p>
+</blockquote>
+<h1><a class="anchor" id="license"></a>
 License</h1>
 <p>IoT Socket is provided under <a href="https://opensource.org/licenses/Apache-2.0">Apache 2.0</a> license. </p>
 </div></div><!-- PageDoc -->

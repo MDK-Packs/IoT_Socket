@@ -543,7 +543,9 @@ Functions</h2></td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketProtocol.html#gac9e564c101a8b0669c6e54496cf75655">IOT_SOCKET_IPPROTO_TCP</a>   </td><td class="markdownTableBodyLeft">Must be used with <a class="el" href="group__iotSocketType.html#gacbec51e70b70979a6d8e0f46e245c357">IOT_SOCKET_SOCK_STREAM</a> socket type    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketProtocol.html#gad1f0810ffd16aaf73e25c54d1f2b7f53">IOT_SOCKET_IPPROTO_UDP</a>   </td><td class="markdownTableBodyLeft">Must be used with <a class="el" href="group__iotSocketType.html#ga930c520d329bafc27847f5183a9f48ce">IOT_SOCKET_SOCK_DGRAM</a> socket type   </td></tr>
+<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketProtocol.html#gad1f0810ffd16aaf73e25c54d1f2b7f53">IOT_SOCKET_IPPROTO_UDP</a>   </td><td class="markdownTableBodyLeft">Must be used with <a class="el" href="group__iotSocketType.html#ga930c520d329bafc27847f5183a9f48ce">IOT_SOCKET_SOCK_DGRAM</a> socket type    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><span class="XML-Token">0</span>   </td><td class="markdownTableBodyLeft">The system selects a matching protocol for the socket type   </td></tr>
 </table>
 <p><b>Example:</b> </p><ul>
 <li>see <a class="el" href="group__iotSocketAPI.html#ga1c34f803e04b807a7b7f895611702f75">iotSocketListen</a>, <a class="el" href="group__iotSocketAPI.html#ga51dba6e1df39d9d044d5557e0bfcf5cb">iotSocketConnect</a> </li>
@@ -692,15 +694,15 @@ Functions</h2></td></tr>
 <p>The argument <em>socket</em> specifies a socket identification number returned from a previous call to <a class="el" href="group__iotSocketAPI.html#gac758b9287fb2121fb7067811aa7257b2">iotSocketCreate</a>.</p>
 <p>The argument <em>opt_id</em> is the socket option for which the value is to be retrieved. The following socket options are supported: </p><table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadLeft">Option   </th><th class="markdownTableHeadLeft">Description    </th></tr>
+<th class="markdownTableHeadLeft">Option   </th><th class="markdownTableHeadLeft">Type   </th><th class="markdownTableHeadLeft">Description    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketOptions.html#ga76690608d0b534dfd7c5d3f86100e8c2">IOT_SOCKET_SO_RCVTIMEO</a>   </td><td class="markdownTableBodyLeft">Timeout for receiving in blocking mode    </td></tr>
+<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketOptions.html#ga76690608d0b534dfd7c5d3f86100e8c2">IOT_SOCKET_SO_RCVTIMEO</a>   </td><td class="markdownTableBodyLeft">int32_t   </td><td class="markdownTableBodyLeft">Timeout for receiving in blocking mode    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketOptions.html#ga5fa39acb5e480bf6c92e4d2ee1765600">IOT_SOCKET_SO_SNDTIMEO</a>   </td><td class="markdownTableBodyLeft">Timeout for sending in blocking mode    </td></tr>
+<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketOptions.html#ga5fa39acb5e480bf6c92e4d2ee1765600">IOT_SOCKET_SO_SNDTIMEO</a>   </td><td class="markdownTableBodyLeft">int32_t   </td><td class="markdownTableBodyLeft">Timeout for sending in blocking mode    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketOptions.html#gacd75f5b079c35096b6e5a90a9d4cc116">IOT_SOCKET_SO_KEEPALIVE</a>   </td><td class="markdownTableBodyLeft">Keep-alive mode for the stream socket    </td></tr>
+<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketOptions.html#gacd75f5b079c35096b6e5a90a9d4cc116">IOT_SOCKET_SO_KEEPALIVE</a>   </td><td class="markdownTableBodyLeft">int32_t   </td><td class="markdownTableBodyLeft">Keep-alive mode for the stream socket    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketOptions.html#gae18aea4c415256d32825eb8b719925c7">IOT_SOCKET_SO_TYPE</a>   </td><td class="markdownTableBodyLeft">Type of the socket (stream or datagram)   </td></tr>
+<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketOptions.html#gae18aea4c415256d32825eb8b719925c7">IOT_SOCKET_SO_TYPE</a>   </td><td class="markdownTableBodyLeft">int32_t   </td><td class="markdownTableBodyLeft">Type of the socket (stream or datagram)   </td></tr>
 </table>
 <p>The argument <em>opt_val</em> points to the buffer that will receive the value of the <em>opt_id</em>.</p>
 <p>The argument <em>opt_len</em> contains the length of the buffer at the input and returns the length of the option information on the output.</p>
@@ -1356,15 +1358,15 @@ Functions</h2></td></tr>
 <p>The argument <em>socket</em> specifies a socket identification number returned from a previous call to <a class="el" href="group__iotSocketAPI.html#gac758b9287fb2121fb7067811aa7257b2">iotSocketCreate</a>.</p>
 <p>The argument <em>opt_id</em> is the socket option for which the value is to be set. The following socket options are supported: </p><table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadLeft">Option   </th><th class="markdownTableHeadLeft">Description    </th></tr>
+<th class="markdownTableHeadLeft">Option   </th><th class="markdownTableHeadLeft">Type   </th><th class="markdownTableHeadLeft">Description    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketOptions.html#ga972b3227d315b628803d9462b26a89ee">IOT_SOCKET_IO_FIONBIO</a>   </td><td class="markdownTableBodyLeft">Non-blocking mode for the socket    </td></tr>
+<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketOptions.html#ga972b3227d315b628803d9462b26a89ee">IOT_SOCKET_IO_FIONBIO</a>   </td><td class="markdownTableBodyLeft">int32_t   </td><td class="markdownTableBodyLeft">Non-blocking mode for the socket    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketOptions.html#ga76690608d0b534dfd7c5d3f86100e8c2">IOT_SOCKET_SO_RCVTIMEO</a>   </td><td class="markdownTableBodyLeft">Timeout for receiving in blocking mode    </td></tr>
+<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketOptions.html#ga76690608d0b534dfd7c5d3f86100e8c2">IOT_SOCKET_SO_RCVTIMEO</a>   </td><td class="markdownTableBodyLeft">int32_t   </td><td class="markdownTableBodyLeft">Timeout for receiving in blocking mode    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketOptions.html#ga5fa39acb5e480bf6c92e4d2ee1765600">IOT_SOCKET_SO_SNDTIMEO</a>   </td><td class="markdownTableBodyLeft">Timeout for sending in blocking mode    </td></tr>
+<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketOptions.html#ga5fa39acb5e480bf6c92e4d2ee1765600">IOT_SOCKET_SO_SNDTIMEO</a>   </td><td class="markdownTableBodyLeft">int32_t   </td><td class="markdownTableBodyLeft">Timeout for sending in blocking mode    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketOptions.html#gacd75f5b079c35096b6e5a90a9d4cc116">IOT_SOCKET_SO_KEEPALIVE</a>   </td><td class="markdownTableBodyLeft">Keep-alive mode for the stream socket   </td></tr>
+<td class="markdownTableBodyLeft"><a class="el" href="group__iotSocketOptions.html#gacd75f5b079c35096b6e5a90a9d4cc116">IOT_SOCKET_SO_KEEPALIVE</a>   </td><td class="markdownTableBodyLeft">int32_t   </td><td class="markdownTableBodyLeft">Keep-alive mode for the stream socket   </td></tr>
 </table>
 <p>The argument <em>opt_val</em> points to the buffer containing the value of the <em>opt_id</em>.</p>
 <p>The argument <em>opt_len</em> tells the exact length of the option.</p>
