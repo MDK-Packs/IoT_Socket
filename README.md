@@ -1,16 +1,16 @@
 # IoT Socket
-Simple IP Socket (BSD like). [The interface documentation is here](https://mdk-packs.github.io/IoT_Socket/html/index.html).
+Simple IP Socket (BSD like). [The interface documentation is here](https://mdk-packs.github.io/IoT_Socket).
 
 ## Overview
 This repository contains the code of IoT Socket - a simple [BSD like](https://en.wikipedia.org/wiki/Berkeley_sockets) IP socket interface that implements the glue logic between IoT cloud connectors (IoT clients) and the underlying communication stack as shown on the picture below.
 
-![Structure of an IoT application](./documentation/src/images/iot_block_diagram.png)
+![Structure of an IoT application](./documentation/Doxygen/src/images/iot_block_diagram.png)
 
 IoT Socket releases in [CMSIS Pack format](https://www.open-cmsis-pack.org/) are available on [CMSIS Packs page](https://developer.arm.com/tools-and-software/embedded/cmsis/cmsis-packs) under *MDK-Packs* category and can be used in environments supporting the CMSIS-Pack concept. Additionally, a generator script `./gen_pack.sh` is provided for building the pack from the repository.
 
 ### Supported network stacks
 IoT Socket implementation variants are available for the following network stacks:
-- [MDK-Middleware Network](https://www.keil.com/pack/doc/mw/Network/html/index.html)
+- [MDK-Middleware Network](https://arm-software.github.io/MDK-Middleware/latest/Network/index.html)
 - [lwIP](https://en.wikipedia.org/wiki/LwIP)
 - [CMSIS-Driver WiFi](https://arm-software.github.io/CMSIS_5/Driver/html/group__wifi__interface__gr.html)
 
@@ -44,7 +44,7 @@ Following IoT client implementations work on top of the IoT Socket API either di
 | `./source/wifi/`              | Implementation for a WiFi CMSIS-Driver              |
 | `./source/mux/`               | IoT Socket Multiplexer                              |
 | `./template/`                 | Template sources for custom implementation          |
-| `./LICENSE.txt`               | License text for the repository content             |
+| `./LICENSE`                   | License text for the repository content             |
 | `./MDK-Packs.IoT_Socket.pdsc` | Pack description file                               |
 | `./gen_pack.sh`               | Pack generation script                              |
 
@@ -54,7 +54,7 @@ To build an IoT Socket CMSIS pack:
 - Verify that following tools are installed on the PC:
   - git bash (e.g. for Windows: https://gitforwindows.org/)
   - ZIP archive creation utility (e.g. [7-Zip](http://www.7-zip.org/download.html))
-  - Doxygen version 1.9.2 (https://sourceforge.net/projects/doxygen/files/rel-1.9.2/)
+  - Doxygen version 1.9.6 (https://sourceforge.net/projects/doxygen/files/rel-1.9.6/)
 - Checkout this repository. For example in git bash with `git clone https://github.com/MDK-Packs/IoT_Socket`.
 - In the local repository folder execute `./gen_pack.sh` in the bash shell.
   - this creates a pack file (for example `MDK-Packs.IoT_Socket.1.3.0.pack`) and places it directly in the local repo folder.
