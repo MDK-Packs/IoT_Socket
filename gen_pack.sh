@@ -1,102 +1,116 @@
-#!/bin/bash
-
-# Version: 1.0 
-# Date: 2018-05-25
+#!/usr/bin/env bash
+# Version: 3.0
+# Date: 2023-11-06
 # This bash script generates a CMSIS Software Pack:
 #
-# Requirements:
-# bash shell
-# curl
-# zip (zip archiving utility) 
-# 
 
-# Pack Vendor
-PACK_VENDOR=MDK-Packs
-# Pack Name
-PACK_NAME=IoT_Socket
+set -o pipefail
 
-# Pack Destination Folder
-PACK_DESTINATION=./
+# Set version of gen pack library
+# For available versions see https://github.com/Open-CMSIS-Pack/gen-pack/tags.
+# Use the tag name without the prefix "v", e.g., 0.7.0
+REQUIRED_GEN_PACK_LIB="0.11.1"
 
-# Pack Build Folder
-PACK_BUILD=./build
+# Set default command line arguments
+DEFAULT_ARGS=()
 
-# Pack build utilities Repository
-UTILITIES_URL=https://github.com/ARM-software/CMSIS_5/blob/master/
-UTILITIES_TAG=1.0.0
-UTILITIES_DIR=./Utilities
-UTILITIES_OS=Win32
-if [ $UTILITIES_OS = "Win32" ]; then
-  ZIP="/c/Program\ Files/7-Zip/7z.exe"
+# Pack warehouse directory - destination
+# Default: ./output
+#
+# PACK_OUTPUT=./output
+
+# Temporary pack build directory,
+# Default: ./build
+#
+# PACK_BUILD=./build
+
+# Specify directory names to be added to pack base directory
+# An empty list defaults to all folders next to this script.
+# Default: empty (all folders)
+#
+PACK_DIRS="
+  documentation
+  include
+  source
+  template
+"
+
+# Specify file names to be added to pack base directory
+# Default: empty
+#
+PACK_BASE_FILES="
+  LICENSE
+"
+
+# Specify file names to be deleted from pack build directory
+# Default: empty
+#
+PACK_DELETE_FILES="
+  documentation/Doxygen
+"
+
+# Specify patches to be applied
+# Default: empty
+#
+# PACK_PATCH_FILES=""
+
+# Specify addition argument to packchk
+# Default: empty
+#
+# PACKCHK_ARGS=()
+
+# Specify additional dependencies for packchk
+# Default: empty
+#
+PACKCHK_DEPS="
+  ARM.CMSIS.pdsc
+"
+
+# Optional: restrict fallback modes for changelog generation
+# Default: full
+# Values:
+# - full      Tag annotations, release descriptions, or commit messages (in order)
+# - release   Tag annotations, or release descriptions (in order)
+# - tag       Tag annotations only
+#
+PACK_CHANGELOG_MODE="tag"
+
+#
+# custom pre-processing steps
+#
+# usage: preprocess <build>
+#   <build>  The build folder
+#
+function preprocess() {
+  # add custom steps here to be executed
+  # before populating the pack build folder
+  ./documentation/Doxygen/gen_doc.sh
+  return 0
+}
+
+#
+# custom post-processing steps
+#
+# usage: postprocess <build>
+#   <build>  The build folder
+#
+function postprocess() {
+  # add custom steps here to be executed
+  # after populating the pack build folder
+  # but before archiving the pack into output folder
+  return 0
+}
+
+############ DO NOT EDIT BELOW ###########
+
+# Set GEN_PACK_LIB_PATH to use a specific gen-pack library root
+# ... instead of bootstrap based on REQUIRED_GEN_PACK_LIB
+if [[ -f "${GEN_PACK_LIB_PATH}/gen-pack" ]]; then
+  . "${GEN_PACK_LIB_PATH}/gen-pack"
 else
-  ZIP=zip
+  . <(curl -sL "https://raw.githubusercontent.com/Open-CMSIS-Pack/gen-pack/main/bootstrap")
 fi
 
-# if not present, fetch utilities
-if [ ! -d $UTILITIES_DIR ]; then
-  mkdir $UTILITIES_DIR
-  pushd $UTILITIES_DIR
-  mkdir $UTILITIES_OS
-  # PackChk
-  curl -L $UTILITIES_URL/CMSIS/Utilities/$UTILITIES_OS/PackChk.exe?raw=true -o $UTILITIES_OS/PackChk.exe
-  popd
-fi
+gen_pack "${DEFAULT_ARGS[@]}" "$@"
 
-#if $PACK_BUILD folder does not exist create it
-if [ ! -d $PACK_BUILD ]; then
-  mkdir $PACK_BUILD
-fi
-
-# Generate documentation
-pushd ./documentation
-./gen_doc.sh
-errorlevel=$?
-popd
-if [ $errorlevel -ne 0 ]; then
-  echo "build aborted: documentation build failed"
-  exit
-fi
-
-#if $PACK_BUILD/documentation folder does not exist create it
-if [ ! -d $PACK_BUILD/documentation ]; then
-  mkdir $PACK_BUILD/documentation
-fi
-# Move built documentation into $PACK_BUILD
-mv -v ./documentation/html/* $PACK_BUILD/documentation/
-rm -rf ./documentation/html/
-
-# Copy files into $PACK_BUILD
-cp -f  ./$PACK_VENDOR.$PACK_NAME.pdsc $PACK_BUILD/ 
-cp -f  ./LICENSE.txt $PACK_BUILD/ 
-cp -vr ./include $PACK_BUILD/
-cp -vr ./source $PACK_BUILD/
-cp -vr ./template $PACK_BUILD/
-
-# Run Pack Check and generate PackName file
-$UTILITIES_DIR/$UTILITIES_OS/PackChk.exe $PACK_BUILD/$PACK_VENDOR.$PACK_NAME.pdsc -n PackName.txt -x M362
-errorlevel=$?
-
-if [ $errorlevel -ne 0 ]; then
-  echo "build aborted: pack check failed"
-  exit
-fi
-
-PACKNAME=`cat PackName.txt`
-rm -rf PackName.txt
-
-# Archiving
-# $ZIP a $PACKNAME
-pushd $PACK_BUILD
-/c/Program\ Files/7-Zip/7z.exe a ../$PACKNAME -tzip
-popd
-errorlevel=$?
-if [ $errorlevel -ne 0 ]; then
-  echo "build aborted: archiving failed"
-  exit
-fi
-
-echo "build of pack succeeded"
-# Clean up
-echo "cleaning up"
-rm -rf $PACK_BUILD
-rm -rf $UTILITIES_DIR
+exit 0
