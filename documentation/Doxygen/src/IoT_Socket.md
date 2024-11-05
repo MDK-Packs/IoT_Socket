@@ -58,4 +58,4 @@ The table below lists the differences that IoT socket has comparing to BSD socke
 
 ## License {#license}
 
-IoT Socket is provided under [Apache 2.0](https://opensource.org/licenses/Apache-2.0) license.
+IoT Socket is provided under [Apache 2.0](https://opensource.org/license/apache-2-0) license.
