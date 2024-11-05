@@ -24,6 +24,20 @@
 // Import number of available BSD sockets
 #include "Net_Config_BSD.h"
 
+// Network Core IPv6 definition
+#ifdef RTE_Network_IPv4  
+  // Version 7 (MDK-Pro, MDK-Plus)
+  #ifdef RTE_Network_IPv6
+    #define Network_IPv6
+  #endif
+#else
+  // Version 8 (MDK)
+  #include "Net_Config.h"
+  #if (NET_CORE_VARIANT == 1)
+    #define Network_IPv6
+  #endif
+#endif
+
 // Number of available sockets
 #define NUM_SOCKS   (BSD_NUM_SOCKS + BSD_SERVER_SOCKS)
 
@@ -104,9 +118,11 @@ int32_t iotSocketCreate (int32_t af, int32_t type, int32_t protocol) {
     case IOT_SOCKET_AF_INET:
       af = AF_INET;
       break;
+#ifdef Network_IPv6
     case IOT_SOCKET_AF_INET6:
       af = AF_INET6;
       break;
+#endif
     default:
       return IOT_SOCKET_EINVAL;
   }
@@ -164,7 +180,7 @@ int32_t iotSocketBind (int32_t socket, const uint8_t *ip, uint32_t ip_len, uint1
       sa->sin_port = htons(port);
       addr_len     = sizeof(SOCKADDR_IN);
     } break;
-#if defined(RTE_Network_IPv6)
+#ifdef Network_IPv6
     case NET_ADDR_IP6_LEN: {
       SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
       sa->sin6_family = AF_INET6;
@@ -200,7 +216,7 @@ int32_t iotSocketAccept (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t
   int32_t rc;
 
   rc = accept(socket, (SOCKADDR *)&addr, &addr_len);
-  if (rc < 0) {
+  if (rc <= 0) {
     rc = rc_bsd_to_iot(rc);
     return rc;
   }
@@ -217,7 +233,7 @@ int32_t iotSocketAccept (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t
         *port   = ntohs (sa->sin_port);
       }
     }
-#if defined(RTE_Network_IPv6)
+#ifdef Network_IPv6
     else if (addr.ss_family == AF_INET6) {
       SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
       if (*ip_len >= sizeof(sa->sin6_addr)) {
@@ -257,7 +273,7 @@ int32_t iotSocketConnect (int32_t socket, const uint8_t *ip, uint32_t ip_len, ui
       sa->sin_port = htons(port);
       addr_len     = sizeof(SOCKADDR_IN);
     } break;
-#if defined(RTE_Network_IPv6)
+#ifdef Network_IPv6
     case NET_ADDR_IP6_LEN: {
       SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
       sa->sin6_family = AF_INET6;
@@ -312,7 +328,7 @@ int32_t iotSocketRecv (int32_t socket, void *buf, uint32_t len) {
     return socket_check_read (socket);
   }
 
-  rc = recv(socket, buf, (int)len, 0);
+  rc = recv(socket, buf, (int32_t)len, 0);
   if (rc < 0) {
     if (rc == BSD_ETIMEDOUT) {
       rc = IOT_SOCKET_EAGAIN;
@@ -334,7 +350,7 @@ int32_t iotSocketRecvFrom (int32_t socket, void *buf, uint32_t len, uint8_t *ip,
     return socket_check_read (socket);
   }
 
-  rc = recvfrom(socket, buf, (int)len, 0, (SOCKADDR *)&addr, &addr_len);
+  rc = recvfrom(socket, buf, (int32_t)len, 0, (SOCKADDR *)&addr, &addr_len);
   if (rc < 0) {
     if (rc == BSD_ETIMEDOUT) {
       rc = IOT_SOCKET_EAGAIN;
@@ -356,7 +372,7 @@ int32_t iotSocketRecvFrom (int32_t socket, void *buf, uint32_t len, uint8_t *ip,
         *port   = ntohs (sa->sin_port);
       }
     }
-#if defined(RTE_Network_IPv6)
+#ifdef Network_IPv6
     else if (addr.ss_family == AF_INET6) {
       SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
       if (*ip_len >= sizeof(sa->sin6_addr)) {
@@ -379,7 +395,7 @@ static int32_t socket_check_write (int32_t socket) {
   fd_set fds;
   int32_t nr;
 
-  if (socket <= 0 || socket > BSD_NUM_SOCKS) {
+  if (socket <= 0 || socket > NUM_SOCKS) {
     return IOT_SOCKET_ESOCK;
   }
 
@@ -401,7 +417,7 @@ int32_t iotSocketSend (int32_t socket, const void *buf, uint32_t len) {
     return socket_check_write (socket);
   }
 
-  rc = send(socket, buf, (int)len, 0);
+  rc = send(socket, buf, (int32_t)len, 0);
   if (rc < 0) {
     if (rc == BSD_ETIMEDOUT) {
       rc = IOT_SOCKET_EAGAIN;
@@ -433,7 +449,7 @@ int32_t iotSocketSendTo (int32_t socket, const void *buf, uint32_t len, const ui
         sa->sin_port = htons(port);
         addr_len     = sizeof(SOCKADDR_IN);
       } break;
-#if defined(RTE_Network_IPv6)
+#ifdef Network_IPv6
       case NET_ADDR_IP6_LEN: {
         SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
         sa->sin6_family = AF_INET6;
@@ -445,9 +461,9 @@ int32_t iotSocketSendTo (int32_t socket, const void *buf, uint32_t len, const ui
       default:
         return IOT_SOCKET_EINVAL;
     }
-    rc = sendto(socket, buf, (int)len, 0, (SOCKADDR *)&addr, addr_len);
+    rc = sendto(socket, buf, (int32_t)len, 0, (SOCKADDR *)&addr, addr_len);
   } else {
-    rc = sendto(socket, buf, (int)len, 0, NULL, 0);
+    rc = sendto(socket, buf, (int32_t)len, 0, NULL, 0);
   }
 
   if (rc < 0) {
@@ -490,7 +506,7 @@ int32_t iotSocketGetSockName (int32_t socket, uint8_t *ip, uint32_t *ip_len, uin
       rc = 0;
     }
   }   
-#if defined(RTE_Network_IPv6)
+#ifdef Network_IPv6
   else if (addr.ss_family == AF_INET6) {
     SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
     if ((ip != NULL) && (ip_len != NULL)) {
@@ -539,7 +555,7 @@ int32_t iotSocketGetPeerName (int32_t socket, uint8_t *ip, uint32_t *ip_len, uin
       rc = 0;
     }
   }
-#if defined(RTE_Network_IPv6)
+#ifdef Network_IPv6
   else if (addr.ss_family == AF_INET6) {
     SOCKADDR_IN6 *sa = (SOCKADDR_IN6 *)&addr;
     if ((ip != NULL) && (ip_len != NULL)) {
@@ -567,16 +583,16 @@ int32_t iotSocketGetOpt (int32_t socket, int32_t opt_id, void *opt_val, uint32_t
     case IOT_SOCKET_IO_FIONBIO:
       return IOT_SOCKET_EINVAL;
     case IOT_SOCKET_SO_RCVTIMEO:
-      rc = getsockopt(socket, SOL_SOCKET, SO_RCVTIMEO,  (char *)opt_val, (int *)opt_len);
+      rc = getsockopt(socket, SOL_SOCKET, SO_RCVTIMEO,  (char *)opt_val, (int32_t *)opt_len);
       break;
     case IOT_SOCKET_SO_SNDTIMEO:
-      rc = getsockopt(socket, SOL_SOCKET, SO_SNDTIMEO,  (char *)opt_val, (int *)opt_len);
+      rc = getsockopt(socket, SOL_SOCKET, SO_SNDTIMEO,  (char *)opt_val, (int32_t *)opt_len);
       break;
     case IOT_SOCKET_SO_KEEPALIVE:
-      rc = getsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, (char *)opt_val, (int *)opt_len);
+      rc = getsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, (char *)opt_val, (int32_t *)opt_len);
       break;
     case IOT_SOCKET_SO_TYPE:
-      rc = getsockopt(socket, SOL_SOCKET, SO_TYPE,      (char *)opt_val, (int *)opt_len);
+      rc = getsockopt(socket, SOL_SOCKET, SO_TYPE,      (char *)opt_val, (int32_t *)opt_len);
       break;
     default:
       return IOT_SOCKET_EINVAL;
@@ -601,17 +617,17 @@ int32_t iotSocketSetOpt (int32_t socket, int32_t opt_id, const void *opt_val, ui
       }
       break;
     case IOT_SOCKET_SO_RCVTIMEO:
-      rc = setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO,  (const char *)opt_val, (int)opt_len);
+      rc = setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO,  (const char *)opt_val, (int32_t)opt_len);
       if (rc == 0) {
         sock_attr[socket-1].tv_sec  = *(uint32_t *)opt_val / 1000U;
         sock_attr[socket-1].tv_msec = *(uint32_t *)opt_val % 1000U;
       }
       break;
     case IOT_SOCKET_SO_SNDTIMEO:
-      rc = setsockopt(socket, SOL_SOCKET, SO_SNDTIMEO,  (const char *)opt_val, (int)opt_len);
+      rc = setsockopt(socket, SOL_SOCKET, SO_SNDTIMEO,  (const char *)opt_val, (int32_t)opt_len);
       break;
     case IOT_SOCKET_SO_KEEPALIVE:
-      rc = setsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, (const char *)opt_val, (int)opt_len);
+      rc = setsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, (const char *)opt_val, (int32_t)opt_len);
       break;
     case IOT_SOCKET_SO_TYPE:
       return IOT_SOCKET_EINVAL;
@@ -654,7 +670,7 @@ int32_t iotSocketGetHostByName (const char *name, int32_t af, uint8_t *ip, uint3
       }
       addr_type = NET_ADDR_IP4;
       break;
-#if defined(RTE_Network_IPv6)
+#ifdef Network_IPv6
     case IOT_SOCKET_AF_INET6:
       if (*ip_len < NET_ADDR_IP6_LEN) {
         return IOT_SOCKET_EINVAL;
@@ -687,7 +703,7 @@ int32_t iotSocketGetHostByName (const char *name, int32_t af, uint8_t *ip, uint3
       memcpy(ip, &addr.addr, NET_ADDR_IP4_LEN);
       *ip_len = NET_ADDR_IP4_LEN;
       break;
-#if defined(RTE_Network_IPv6)
+#ifdef Network_IPv6
     case NET_ADDR_IP6:
       memcpy(ip, &addr.addr, NET_ADDR_IP6_LEN);
       *ip_len = NET_ADDR_IP6_LEN;
