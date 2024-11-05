@@ -94,7 +94,7 @@
         <file category="sourceC" name="template/iot_socket.c" attr="template" select="IoT Socket"/>
       </files>
     </component>
-    <component Cclass="IoT Utility" Cgroup="Socket" Csub="MDK Network" Capiversion="1.2.0" Cversion="1.2.1" condition="MDK Network Socket">
+    <component Cclass="IoT Utility" Cgroup="Socket" Csub="MDK Network" Capiversion="1.2.0" Cversion="1.2.2" condition="MDK Network Socket">
       <description>IoT Socket implementation with MDK::Network</description>
       <RTE_Components_h>
         <!-- the following content goes into file 'RTE_Components.h' -->

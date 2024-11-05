@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 Arm Limited. All rights reserved.
+ * Copyright (c) 2018-2024 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -24,12 +24,15 @@
 // Import number of available BSD sockets
 #include "Net_Config_BSD.h"
 
+// Number of available sockets
+#define NUM_SOCKS   (BSD_NUM_SOCKS + BSD_SERVER_SOCKS)
+
 // Socket attributes
 struct {
   uint32_t ionbio  : 1;
   uint32_t tv_sec  : 21;
   uint32_t tv_msec : 10;
-} sock_attr[BSD_NUM_SOCKS];
+} sock_attr[NUM_SOCKS];
 
 // Convert return codes from BSD to IoT
 static int32_t rc_bsd_to_iot (int32_t bsd_rc) {
@@ -228,6 +231,9 @@ int32_t iotSocketAccept (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t
 #endif
   }
 
+  // Copy socket attributes
+  memcpy (&sock_attr[rc-1], &sock_attr[socket-1], sizeof(sock_attr[0]));
+
   return rc;
 }
 
@@ -276,7 +282,7 @@ static int32_t socket_check_read (int32_t socket) {
   fd_set  fds;
   int32_t nr;
 
-  if (socket <= 0 || socket > BSD_NUM_SOCKS) {
+  if (socket <= 0 || socket > NUM_SOCKS) {
     return IOT_SOCKET_ESOCK;
   }
 
