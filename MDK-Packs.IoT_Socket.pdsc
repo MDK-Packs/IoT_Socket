@@ -13,6 +13,12 @@
   </licenseSets>
   <repository type="git">https://github.com/MDK-Packs/IoT_Socket.git</repository>
   <releases>
+    <release version="1.4.0">
+      Updated IoT Socket implementation with MDK Network:
+      - added support for Network version 8
+      - fixed problem with socket operation in server mode
+      - corrected possible memset overflow
+    </release>
     <release version="1.3.1">
       Updated IoT Socket implementation with lwIP:
       - corrected iotSocketGetOpt/iotSocketSetOpt timeout options
@@ -62,12 +68,14 @@
       <accept Cbundle="MDK-Pro"    Cclass="Network" Cgroup="Socket"  Csub="BSD"        Cversion="7.9.0"/>
       <accept Cbundle="MDK-Plus"   Cclass="Network" Cgroup="Socket"  Csub="BSD"        Cversion="7.9.0"/>
       <accept Cbundle="MDK-Source" Cclass="Network" Cgroup="Socket"  Csub="BSD"        Cversion="7.9.0"/>
+      <accept Cbundle="MDK"        Cclass="Network" Cgroup="Socket"  Csub="BSD"        Cversion="8.0.0"/>
     </condition>
     <condition id="MDK Network DNS">
       <description>MDK Network DNS Client</description>
       <accept Cbundle="MDK-Pro"    Cclass="Network" Cgroup="Service" Csub="DNS Client" Cversion="7.9.0"/>
       <accept Cbundle="MDK-Plus"   Cclass="Network" Cgroup="Service" Csub="DNS Client" Cversion="7.9.0"/>
       <accept Cbundle="MDK-Source" Cclass="Network" Cgroup="Service" Csub="DNS Client" Cversion="7.9.0"/>
+      <accept Cbundle="MDK"        Cclass="Network" Cgroup="Service" Csub="DNS Client" Cversion="8.0.0"/>
     </condition>
     <condition id="MDK Network Socket">
       <description>MDK Network Socket</description>
@@ -94,7 +102,7 @@
         <file category="sourceC" name="template/iot_socket.c" attr="template" select="IoT Socket"/>
       </files>
     </component>
-    <component Cclass="IoT Utility" Cgroup="Socket" Csub="MDK Network" Capiversion="1.2.0" Cversion="1.2.2" condition="MDK Network Socket">
+    <component Cclass="IoT Utility" Cgroup="Socket" Csub="MDK Network" Capiversion="1.2.0" Cversion="1.3.0" condition="MDK Network Socket">
       <description>IoT Socket implementation with MDK::Network</description>
       <RTE_Components_h>
         <!-- the following content goes into file 'RTE_Components.h' -->
