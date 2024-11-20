@@ -1,0 +1,34 @@
+layer:
+  type: Socket
+  description: IoT Socket interface using FreeRTOS+TCP over Ethernet
+
+  connections:
+    - connect: FreeRTOS+TCP Socket
+      consumes:
+        - CMSIS_ETH
+        - CMSIS-RTOS2
+        - FreeRTOS
+      provides:
+        - IoT_Socket
+
+  packs:
+    - pack: AWS::FreeRTOS-Plus-TCP@^4.0.1
+    - pack: MDK-Packs::IoT_Socket@^1.4.0
+
+  components:
+    - component: FreeRTOS:FreeRTOS+ TCP:Buffer Allocation&Buffer Allocation 2
+    - component: FreeRTOS:FreeRTOS+ TCP:Compiler Port&Keil
+    - component: FreeRTOS:FreeRTOS+ TCP:Core Library
+    - component: FreeRTOS:FreeRTOS+ TCP:Network Interface&Custom
+
+    - component: IoT Utility:Socket:Custom
+
+  groups:
+    - group: Socket
+      files:
+        - file: ./FreeRTOSIPConfig.h
+        - file: ./NetworkInterfaceConfig.h
+        - file: ./NetworkInterface.c
+        - file: ./app_interface.c
+        - file: ./iot_socket.c
+        - file: ./socket_startup.c

@@ -31,6 +31,7 @@ DEFAULT_ARGS=()
 PACK_DIRS="
   documentation
   include
+  layer
   source
   template
 "

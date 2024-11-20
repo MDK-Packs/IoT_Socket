@@ -15,6 +15,11 @@
   <releases>
     <release version="1.4.0">
       Added IoT Socket implementation with VSocket
+      Added Socket layers:
+      - VSocket
+      - FreeRTOS+TCP over Ethernet
+      - MDK Network over Ethernet
+      - WiFi
       Updated IoT Socket implementation with MDK Network:
       - added support for Network version 8
       - fixed problem with socket operation in server mode
@@ -160,4 +165,12 @@
       </files>
     </component>
   </components>
+
+  <csolution>
+    <clayer type="Socket" path="layer/VSocket"           file="Socket.clayer.yml" copy-to="Socket/VSocket"/>
+    <clayer type="Socket" path="layer/FreeRTOS_Plus_TCP" file="Socket.clayer.yml" copy-to="Socket/FreeRTOS_Plus_TCP"/>
+    <clayer type="Socket" path="layer/MDK_Network_ETH"   file="Socket.clayer.yml" copy-to="Socket/MDK_Network_ETH"/>
+    <clayer type="Socket" path="layer/WiFi"              file="Socket.clayer.yml" copy-to="Socket/WiFi"/>
+  </csolution>
+
 </package>
