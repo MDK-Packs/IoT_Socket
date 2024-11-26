@@ -140,9 +140,11 @@ Component selection</h1>
 <p>IoT Socket pack contains following implementation variants:</p>
 <ul>
 <li><b>Custom</b>: adds the API header file (<code>iot_socket.h</code>) to the include list and enables a template for custom IoT Socket implementation. See <a class="el" href="iot_socket_using.html#iot_socket_custom">Custom IoT Socket</a> for details.</li>
-<li><b>MDK-Network</b>: provides IoT Socket implementation for the <a href="https://www.keil.com/pack/doc/mw/Network/html/index.html">MDK-Middleware Network stack</a>.</li>
+<li><b>FreeRTOS-Plus-TCP</b>: provides IoT Socket implementation for the <a href="https://www.freertos.org/Documentation/03-Libraries/02-FreeRTOS-plus/02-FreeRTOS-plus-TCP/01-FreeRTOS-Plus-TCP">FreeRTOS-Plus-TCP stack</a>.</li>
+<li><b>MDK Network</b>: provides IoT Socket implementation for the <a href="https://arm-software.github.io/MDK-Middleware/latest/Network/index.html">MDK-Middleware Network stack</a>.</li>
 <li><b>Mux</b>: implements IoT Socket Multiplexer that allows to retarget communication to a different socket interface at run-time (for example from wireless to wired). See <a class="el" href="iot_socket_using.html#iot_socket_mux">IoT Socket Multiplexer</a> for details.</li>
-<li><b>WiFi</b>: provides IoT Socket over <a href="https://arm-software.github.io/CMSIS_5/Driver/html/group__wifi__interface__gr.html">CMSIS-Driver WiFi interface</a>.</li>
+<li><b>VSocket</b>: provides IoT Socket over <a href="https://arm-software.github.io/AVH/main/simulation/html/group__arm__vsocket.html">VSocket</a> for <a href="https://www.arm.com/products/development-tools/simulation/virtual-hardware">Arm Virtual Hardware</a>.</li>
+<li><b>WiFi</b>: provides IoT Socket over <a href="https://arm-software.github.io/CMSIS_6/latest/Driver/group__wifi__interface__gr.html">CMSIS-Driver WiFi interface</a>.</li>
 <li><b>lwIP</b>: implements IoT Socket on top of the <a href="https://en.wikipedia.org/wiki/LwIP">lwIP stack</a>.</li>
 </ul>
 <p>You can add an IoT Socket variant to a µVision project as follows:</p><ul>
