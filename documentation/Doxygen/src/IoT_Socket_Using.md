@@ -19,9 +19,11 @@ Alternatively, the pack file can be downloaded directly from the [CMSIS Packs pa
 IoT Socket pack contains following implementation variants:
 
 - **Custom**: adds the API header file (`iot_socket.h`) to the include list and enables a template for custom IoT Socket implementation. See \ref iot_socket_custom for details.
-- **MDK-Network**: provides IoT Socket implementation for the [MDK-Middleware Network stack](https://www.keil.com/pack/doc/mw/Network/html/index.html).
+- **FreeRTOS-Plus-TCP**: provides IoT Socket implementation for the [FreeRTOS-Plus-TCP stack](https://www.freertos.org/Documentation/03-Libraries/02-FreeRTOS-plus/02-FreeRTOS-plus-TCP/01-FreeRTOS-Plus-TCP).
+- **MDK Network**: provides IoT Socket implementation for the [MDK-Middleware Network stack](https://arm-software.github.io/MDK-Middleware/latest/Network/index.html).
 - **Mux**: implements IoT Socket Multiplexer that allows to retarget communication to a different socket interface at run-time (for example from wireless to wired). See \ref iot_socket_mux for details.
-- **WiFi**: provides IoT Socket over [CMSIS-Driver WiFi interface](https://arm-software.github.io/CMSIS_5/Driver/html/group__wifi__interface__gr.html).
+- **VSocket**: provides IoT Socket over [VSocket](https://arm-software.github.io/AVH/main/simulation/html/group__arm__vsocket.html) for [Arm Virtual Hardware](https://www.arm.com/products/development-tools/simulation/virtual-hardware).
+- **WiFi**: provides IoT Socket over [CMSIS-Driver WiFi interface](https://arm-software.github.io/CMSIS_6/latest/Driver/group__wifi__interface__gr.html).
 - **lwIP**: implements IoT Socket on top of the [lwIP stack](https://en.wikipedia.org/wiki/LwIP).
 
 You can add an IoT Socket variant to a µVision project as follows:

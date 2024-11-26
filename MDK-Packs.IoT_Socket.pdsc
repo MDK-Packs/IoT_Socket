@@ -2,7 +2,7 @@
 <package schemaVersion="1.7.37" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.37/schema/PACK.xsd">
   <vendor>MDK-Packs</vendor>
   <name>IoT_Socket</name>
-  <description>Simple IP Socket (BSD like)</description>
+  <description overview="documentation/OVERVIEW.md">Simple IP Socket (BSD like)</description>
   <!-- web download link -->
   <url>https://github.com/MDK-Packs/Pack/raw/master/IoT_Socket/</url>
   <license>LICENSE</license>

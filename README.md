@@ -11,8 +11,10 @@ IoT Socket releases in [CMSIS Pack format](https://www.open-cmsis-pack.org/) are
 ### Supported network stacks
 IoT Socket implementation variants are available for the following network stacks:
 - [MDK-Middleware Network](https://arm-software.github.io/MDK-Middleware/latest/Network/index.html)
+- [FreeRTOS-Plus-TCP](https://www.freertos.org/Documentation/03-Libraries/02-FreeRTOS-plus/02-FreeRTOS-plus-TCP/01-FreeRTOS-Plus-TCP)
 - [lwIP](https://en.wikipedia.org/wiki/LwIP)
-- [CMSIS-Driver WiFi](https://arm-software.github.io/CMSIS_5/Driver/html/group__wifi__interface__gr.html)
+- [CMSIS-Driver WiFi](https://arm-software.github.io/CMSIS_6/latest/Driver/group__wifi__interface__gr.html)
+- [VSocket](https://arm-software.github.io/AVH/main/simulation/html/group__arm__vsocket.html) for [Arm Virtual Hardware](https://www.arm.com/products/development-tools/simulation/virtual-hardware)
 
 With the **IoT Socket Multiplexer** functionality it is possible to retarget communication to a different socket interface at run-time (for example from a wireless to wired connection).
 
@@ -38,9 +40,16 @@ Following IoT client implementations work on top of the IoT Socket API either di
 |:------------------------------|:----------------------------------------------------|
 | `./documentation/`            | IoT Socket documentation sources for Doxygen        |
 | `./include/`                  | Header files with the IoT Socket API                |
+| `./layer/`                    | IoT Socket layers                                   |
+| `./layer/FreeRTOS_Plus_TCP/`  | Layer for the FreeRTOS-Plus-TCP stack               |
+| `./layer/MDK_Network_ETH/`    | Layer for the MDK-Middleware network stack over ETH |
+| `./layer/VSocket/`            | Layer for the VSocket (Virtual Socket)              |
+| `./layer/WiFi/`               | Layer for a WiFi CMSIS-Driver                       |
 | `./source/`                   | IoT Socket implementations                          |
+| `./source/freertos_plus_tcp/` | Implementation for the FreeRTOS-Plus-TCP stack      |
 | `./source/lwip/`              | Implementation for the lwIP network stack           |
 | `./source/mdk_network/`       | Implementation for the MDK-Middleware network stack |
+| `./source/vsocket/`           | Implementation for the VSocket (Virtual Socket)     |
 | `./source/wifi/`              | Implementation for a WiFi CMSIS-Driver              |
 | `./source/mux/`               | IoT Socket Multiplexer                              |
 | `./template/`                 | Template sources for custom implementation          |
@@ -57,7 +66,7 @@ To build an IoT Socket CMSIS pack:
   - Doxygen version 1.9.6 (https://sourceforge.net/projects/doxygen/files/rel-1.9.6/)
 - Checkout this repository. For example in git bash with `git clone https://github.com/MDK-Packs/IoT_Socket`.
 - In the local repository folder execute `./gen_pack.sh` in the bash shell.
-  - this creates a pack file (for example `MDK-Packs.IoT_Socket.1.3.0.pack`) and places it directly in the local repo folder.
+  - this creates a pack file (for example `MDK-Packs.IoT_Socket.1.4.0.pack`) and places it directly in the local repo folder.
 
 ## Examples
 

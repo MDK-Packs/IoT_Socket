@@ -10,9 +10,11 @@ Section \ref iot_socket_using describes how to integrate the IoT Socket componen
 
 ## Supported network stacks {#iot_stacks}
 IoT Socket implementation variants are available for the following network stacks:
-- [MDK-Middleware Network](https://www.keil.com/pack/doc/mw/Network/html/index.html)
+- [MDK-Middleware Network](https://arm-software.github.io/MDK-Middleware/latest/Network/index.html)
+- [FreeRTOS-Plus-TCP](https://www.freertos.org/Documentation/03-Libraries/02-FreeRTOS-plus/02-FreeRTOS-plus-TCP/01-FreeRTOS-Plus-TCP)
 - [lwIP](https://en.wikipedia.org/wiki/LwIP)
-- [CMSIS-Driver WiFi](https://arm-software.github.io/CMSIS_5/Driver/html/group__wifi__interface__gr.html)
+- [CMSIS-Driver WiFi](https://arm-software.github.io/CMSIS_6/latest/Driver/group__wifi__interface__gr.html)
+- [VSocket](https://arm-software.github.io/AVH/main/simulation/html/group__arm__vsocket.html) for [Arm Virtual Hardware](https://www.arm.com/products/development-tools/simulation/virtual-hardware)
 
 With the \ref iot_socket_mux functionality it is possible to retarget communication to a different socket interface at run-time (for example from a wireless to wired connection).
 
