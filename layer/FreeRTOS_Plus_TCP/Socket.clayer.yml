@@ -21,7 +21,7 @@ layer:
     - component: FreeRTOS:FreeRTOS+ TCP:Core Library
     - component: FreeRTOS:FreeRTOS+ TCP:Network Interface&Custom
 
-    - component: IoT Utility:Socket:Custom
+    - component: IoT Utility:Socket:FreeRTOS-Plus-TCP
 
   groups:
     - group: Socket
@@ -30,5 +30,4 @@ layer:
         - file: ./NetworkInterfaceConfig.h
         - file: ./NetworkInterface.c
         - file: ./app_interface.c
-        - file: ./iot_socket.c
         - file: ./socket_startup.c
