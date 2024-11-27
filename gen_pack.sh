@@ -58,16 +58,13 @@ PACK_DELETE_FILES="
 # Specify addition argument to packchk
 # Default: empty
 #
-PACKCHK_ARGS=(-x M317)
+PACKCHK_ARGS=(-x M362)
 
 # Specify additional dependencies for packchk
 # Default: empty
 #
 PACKCHK_DEPS="
   ARM.CMSIS.pdsc
-  Keil.MDK-Middleware.pdsc
-  AWS.FreeRTOS-Plus-TCP.pdsc
-  lwIP.lwIP.pdsc
 "
 
 # Optional: restrict fallback modes for changelog generation
