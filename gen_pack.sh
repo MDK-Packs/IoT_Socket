@@ -40,7 +40,9 @@ PACK_DIRS="
 # Default: empty
 #
 PACK_BASE_FILES="
-  LICENSE
+  LICENSE-Apache-2.0
+  LICENSE-MIT
+  LICENSES
 "
 
 # Specify file names to be deleted from pack build directory
