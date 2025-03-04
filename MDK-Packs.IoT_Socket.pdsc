@@ -5,20 +5,16 @@
   <description overview="documentation/OVERVIEW.md">Simple IP Socket (BSD like)</description>
   <!-- web download link -->
   <url>https://github.com/MDK-Packs/Pack/raw/master/IoT_Socket/</url>
-  <license>LICENSES</license>
+  <license>LICENSE</license>
   <licenseSets>
     <licenseSet id="all" default="true" gating="true">
-      <license title="Apache-2.0 License for CMSIS add-ons" name="LICENSE-Apache-2.0" spdx="Apache-2.0"/>
-      <license title="MIT License for FreeRTOS TCP/IP"      name="LICENSE-MIT"        spdx="MIT"/>
+      <license title="Apache-2.0 License for CMSIS add-ons" name="LICENSE" spdx="Apache-2.0"/>
     </licenseSet>
   </licenseSets>
   <repository type="git">https://github.com/MDK-Packs/IoT_Socket.git</repository>
   <releases>
     <release version="1.4.1-dev">
-      Reorganize Licenses:
-      - LICENSES (combined license file: Apache-2.0 and MIT)
-      - LICENSE-Apache-2.0 (for CMSIS add-ons)
-      - LICENSE-MIT (for FreeRTOS TCP/IP)
+      Update License
     </release>
     <release version="1.3.0" date="2022-03-02">
       Added custom IoT Socket component
