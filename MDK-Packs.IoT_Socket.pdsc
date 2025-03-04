@@ -13,8 +13,20 @@
   </licenseSets>
   <repository type="git">https://github.com/MDK-Packs/IoT_Socket.git</repository>
   <releases>
-    <release version="1.4.1-dev">
-      Update License
+    <release version="1.4.0">
+      Added IoT Socket implementation with FreeRTOS-Plus-TCP
+      Added IoT Socket implementation with VSocket
+      Updated IoT Socket implementation with MDK Network:
+      - added support for Network version 8
+      - fixed problem with socket operation in server mode
+      - corrected possible memset overflow
+      Updated IoT Socket implementation with lwIP:
+      - corrected iotSocketGetOpt/iotSocketSetOpt timeout options
+      Added Socket layers:
+      - VSocket
+      - FreeRTOS+TCP over Ethernet
+      - MDK Network over Ethernet
+      - WiFi
     </release>
     <release version="1.3.0" date="2022-03-02">
       Added custom IoT Socket component
