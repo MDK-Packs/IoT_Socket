@@ -8,7 +8,7 @@
   <license>LICENSE</license>
   <licenseSets>
     <licenseSet id="all" default="true" gating="true">
-      <license name="LICENSE.txt" title="Apache 2.0 open-source license" spdx="Apache-2.0"/>
+      <license title="Apache-2.0 License" name="LICENSE" spdx="Apache-2.0"/>
     </licenseSet>
   </licenseSets>
   <repository type="git">https://github.com/MDK-Packs/IoT_Socket.git</repository>
