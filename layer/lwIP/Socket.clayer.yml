@@ -1,0 +1,28 @@
+layer:
+  type: Socket
+  description: IoT Socket interface using lwIP over Ethernet
+
+  connections:
+    - connect: lwIP Socket
+      consumes:
+        - CMSIS_ETH
+        - CMSIS-RTOS2
+      provides:
+        - IoT_Socket
+
+  packs:
+    - pack: MDK-Packs::IoT_Socket@^1.4.0
+    - pack: lwIP::lwIP@^2.3.0
+
+  components:
+    - component: IoT Utility:Socket:lwIP
+    - component: Network&lwIP:API
+    - component: Network&lwIP:CORE&IPv4
+    - component: Network&lwIP:RTOS&CMSIS-RTOS2
+    - component: Network&lwIP:Driver:Ethernet&CMSIS Driver
+    - component: Network&lwIP:Interface:Ethernet
+
+  groups:
+    - group: Socket
+      files:
+        - file: ./socket_startup.c
