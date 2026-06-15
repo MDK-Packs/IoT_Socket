@@ -13,49 +13,8 @@
   </licenseSets>
   <repository type="git">https://github.com/MDK-Packs/IoT_Socket.git</repository>
   <releases>
-    <release version="1.4.0">
-      Added IoT Socket implementation with FreeRTOS-Plus-TCP
-      Added IoT Socket implementation with VSocket
-      Updated IoT Socket implementation with MDK Network:
-      - added support for Network version 8
-      - fixed problem with socket operation in server mode
-      - corrected possible memset overflow
-      Updated IoT Socket implementation with lwIP:
-      - corrected iotSocketGetOpt/iotSocketSetOpt timeout options
-      Added Socket layers:
-      - VSocket
-      - FreeRTOS+TCP over Ethernet
-      - MDK Network over Ethernet
-      - WiFi
-    </release>
-    <release version="1.3.0" date="2022-03-02">
-      Added custom IoT Socket component
-      Added IoT Socket Multiplexer component
-      Updated IoT Socket implementation with MDK Network:
-      - minor update in iotSocketGetSockName/iotSocketGetPeerName:
-        port may be retrieved also without address
-      - corrected iotSocketGetOpt/iotSocketSetOpt return value for invalid options
-      Updated IoT Socket implementation with lwIP:
-      - corrected iotSocketGetOpt/iotSocketSetOpt return value for invalid options
-      - corrected socket bind attribute handling in iotSocketBind
-    </release>
-    <release version="1.2.1" date="2020-07-13">
-      Updated IoT Socket implementation with lwIP:
-      - corrected iotSocketSend return value for non-blocking sockets
-    </release>
-    <release version="1.2.0" date="2020-04-22">
-      Updated IoT Socket API V1.2.0 (support for polling Socket Receive/Send)
-      Updated IoT Socket implementation with MDK Network
-      Added IoT Socket implementation with lwIP
-      Added IoT Socket API documentation
-    </release>
-    <release version="1.1.0" date="2019-04-02">
-      Updated IoT Socket API V1.1.0
-      Updated IoT Socket implementation with MDK Network
-      Added IoT Socket implementation with WiFi Driver
-    </release>
-    <release version="1.0.0" date="2018-05-28">
-      Initial release
+    <release version="1.4.1-dev">
+      Active Development ...
     </release>
   </releases>
   <apis>
