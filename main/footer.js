@@ -1,7 +1,7 @@
 function writeHeader() {
-    document.write('Version 1.4.1-dev1');
+    document.write('Version 1.4.1-dev3');
 };
 
 function writeFooter()  {
-    document.write('Generated on Wed Mar  5 2025 06:25:59 for IoT Socket 1.4.1-dev1+g7da8029. Copyright &copy; 2025 Arm Limited (or its affiliates). All rights reserved.');
+    document.write('Generated on Mon Jun 15 2026 14:06:16 for IoT Socket 1.4.1-dev3+ga9c4c0a. Copyright &copy; 2026 Arm Limited (or its affiliates). All rights reserved.');
 };
