@@ -14,7 +14,7 @@ set -o pipefail
 # Set version of gen pack library
 # For available versions see https://github.com/Open-CMSIS-Pack/gen-pack/tags.
 # Use the tag name without the prefix "v", e.g., 0.7.0
-REQUIRED_GEN_PACK_LIB="0.13.0"
+REQUIRED_GEN_PACK_LIB="0.14.0"
 
 DIRNAME=$(dirname "$(readlink -f "$0")")
 GENDIR=../html
@@ -77,7 +77,7 @@ year=$(date -u +'%Y')
 
 sed -e "s/{projectNumber}/${projectNumber}/" IoT_Socket.dxy.in > IoT_Socket.dxy
 
-git_changelog -f html -p "v" > src/history.txt
+git_changelog -f html > src/history.txt
 
 echo_log "\"${UTILITY_DOXYGEN}\" IoT_Socket.dxy"
 "${UTILITY_DOXYGEN}" IoT_Socket.dxy
