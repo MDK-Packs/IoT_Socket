@@ -1,5 +1,5 @@
 /* -----------------------------------------------------------------------------
- * Copyright (c) 2022-2024 Arm Limited (or its affiliates). All rights reserved.
+ * Copyright (c) 2022-2026 Arm Limited (or its affiliates). All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -30,19 +30,32 @@ int32_t iotSocketCreate (int32_t af, int32_t type, int32_t protocol) {
 
   if (af != IOT_SOCKET_AF_INET) {
     /* Only IPv4 sockets are supported */
-    return IOT_SOCKET_ENOTSUP;
+    return IOT_SOCKET_EINVAL;
   }
 
-  if (type == IOT_SOCKET_SOCK_STREAM) {
-    xType = FREERTOS_SOCK_STREAM;
-  } else {
-    xType = FREERTOS_SOCK_DGRAM;
+  switch (type) {
+    case IOT_SOCKET_SOCK_STREAM:
+      xType = FREERTOS_SOCK_STREAM;
+      break;
+    case IOT_SOCKET_SOCK_DGRAM:
+      xType = FREERTOS_SOCK_DGRAM;
+      break;
+    default:
+      return IOT_SOCKET_EINVAL;
   }
   
-  if (type == IOT_SOCKET_IPPROTO_TCP) {
-    xProtocol = FREERTOS_IPPROTO_TCP;
-  } else {
-    xProtocol = FREERTOS_IPPROTO_UDP;
+  switch (protocol) {
+    case 0:
+      /* FREERTOS_SOCK_DEPENDENT_PROTO */
+      break;
+    case IOT_SOCKET_IPPROTO_TCP:
+      xProtocol = FREERTOS_IPPROTO_TCP;
+      break;
+    case IOT_SOCKET_IPPROTO_UDP:
+      xProtocol = FREERTOS_IPPROTO_UDP;
+      break;
+    default:
+      return IOT_SOCKET_EINVAL;
   }
 
   xSocket = FreeRTOS_socket (FREERTOS_AF_INET, xType, xProtocol);
@@ -60,7 +73,7 @@ int32_t iotSocketCreate (int32_t af, int32_t type, int32_t protocol) {
 
 // Assign a local address to a socket
 int32_t iotSocketBind (int32_t socket, const uint8_t *ip, uint32_t ip_len, uint16_t port) {
-  Socket_t xSocket =(Socket_t)socket;
+  Socket_t xSocket = (Socket_t)socket;
   struct freertos_sockaddr pxAddress;
   BaseType_t rval;
   int32_t stat;
@@ -72,7 +85,7 @@ int32_t iotSocketBind (int32_t socket, const uint8_t *ip, uint32_t ip_len, uint1
   pxAddress.sin_addr = FreeRTOS_inet_addr_quick (ip[0], ip[1], ip[2], ip[3]);
   pxAddress.sin_port = FreeRTOS_htons (port);
 
-  rval = FreeRTOS_bind (xSocket, &pxAddress, sizeof(struct freertos_sockaddr));
+  rval = FreeRTOS_bind (xSocket, &pxAddress, sizeof(pxAddress));
 
   if (rval == 0) {
     /* Socket bound */
@@ -92,7 +105,7 @@ int32_t iotSocketBind (int32_t socket, const uint8_t *ip, uint32_t ip_len, uint1
 
 // Listen for socket connections
 int32_t iotSocketListen (int32_t socket, int32_t backlog) {
-  Socket_t xSocket =(Socket_t)socket;
+  Socket_t xSocket = (Socket_t)socket;
   BaseType_t rval;
   int32_t stat;
 
@@ -112,7 +125,7 @@ int32_t iotSocketListen (int32_t socket, int32_t backlog) {
 
 // Accept a new connection on a socket
 int32_t iotSocketAccept (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t *port) {
-  Socket_t xSocket =(Socket_t)socket;
+  Socket_t xSocket = (Socket_t)socket;
   struct freertos_sockaddr xAddress;
   socklen_t xAddressLength;
   Socket_t xAccept;
@@ -147,7 +160,7 @@ int32_t iotSocketAccept (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t
 
     if (port != NULL) {
       /* Copy remote port */
-      *port = FreeRTOS_htons (xAddress.sin_port);
+      *port = FreeRTOS_ntohs (xAddress.sin_port);
     }
   }
 
@@ -156,7 +169,7 @@ int32_t iotSocketAccept (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t
 
 // Connect a socket to a remote host
 int32_t iotSocketConnect (int32_t socket, const uint8_t *ip, uint32_t ip_len, uint16_t port) {
-  Socket_t xSocket =(Socket_t)socket;
+  Socket_t xSocket = (Socket_t)socket;
   struct freertos_sockaddr xAddress;
   BaseType_t rval;
   int32_t stat;
@@ -168,11 +181,15 @@ int32_t iotSocketConnect (int32_t socket, const uint8_t *ip, uint32_t ip_len, ui
   xAddress.sin_addr = FreeRTOS_inet_addr_quick (ip[0], ip[1], ip[2], ip[3]);
   xAddress.sin_port = FreeRTOS_htons (port);
 
-  rval = FreeRTOS_connect (xSocket, &xAddress, sizeof(struct freertos_sockaddr));
+  rval = FreeRTOS_connect (xSocket, &xAddress, sizeof(xAddress));
 
   if (rval == 0) {
     /* Connect succeeded */
-    stat = 0U;
+    stat = 0;
+  }
+  else if (rval == -pdFREERTOS_ERRNO_EINVAL) {
+    /* Invalid parameter value */
+    stat = IOT_SOCKET_EINVAL;
   }
   else if (rval == -pdFREERTOS_ERRNO_EBADF) {
     /* Not a valid TCP socket */
@@ -187,19 +204,19 @@ int32_t iotSocketConnect (int32_t socket, const uint8_t *ip, uint32_t ip_len, ui
     stat = IOT_SOCKET_EALREADY;
   }
   else if (rval == -pdFREERTOS_ERRNO_EAGAIN) {
-    /* Socket state does not allows a connect operation */
-    stat = IOT_SOCKET_ECONNABORTED;
+    /* Socket state does not allow a connect operation */
+    stat = IOT_SOCKET_EINVAL;
   }
   else if (rval == -pdFREERTOS_ERRNO_EWOULDBLOCK) {
-    /* Operation would block */
-    stat = IOT_SOCKET_ECONNABORTED;
+    /* Operation would block, connect attempt started */
+    stat = IOT_SOCKET_EINPROGRESS;
   }
   else if (rval == -pdFREERTOS_ERRNO_ETIMEDOUT) {
     /* Connect attempt timed out */
     stat = IOT_SOCKET_ETIMEDOUT;
   }
-  else /* rval == -pdFREERTOS_ERRNO_EINVAL */ {
-    stat = IOT_SOCKET_EINVAL;
+  else {
+    stat = IOT_SOCKET_ERROR;
   }
 
   return stat;
@@ -207,7 +224,7 @@ int32_t iotSocketConnect (int32_t socket, const uint8_t *ip, uint32_t ip_len, ui
 
 // Receive data on a connected socket
 int32_t iotSocketRecv (int32_t socket, void *buf, uint32_t len) {
-  Socket_t xSocket =(Socket_t)socket;
+  Socket_t xSocket = (Socket_t)socket;
   BaseType_t rval;
   int32_t stat;
 
@@ -218,8 +235,12 @@ int32_t iotSocketRecv (int32_t socket, void *buf, uint32_t len) {
     if (rval == -pdFREERTOS_ERRNO_EINVAL) {
       /* Not a TCP socket */
       stat = IOT_SOCKET_EINVAL;
-    } else {
-      stat = (int32_t)rval;
+    }
+    else if (rval > 0) {
+      stat = 0;
+    }
+    else {
+      stat = IOT_SOCKET_EAGAIN;
     }
   }
   else if (buf == NULL) {
@@ -256,7 +277,7 @@ int32_t iotSocketRecv (int32_t socket, void *buf, uint32_t len) {
 
 // Receive data on a socket
 int32_t iotSocketRecvFrom (int32_t socket, void *buf, uint32_t len, uint8_t *ip, uint32_t *ip_len, uint16_t *port) {
-  Socket_t xSocket =(Socket_t)socket;
+  Socket_t xSocket = (Socket_t)socket;
   struct freertos_sockaddr xAddress;
   socklen_t xAddressLength;
   BaseType_t rval;
@@ -270,8 +291,12 @@ int32_t iotSocketRecvFrom (int32_t socket, void *buf, uint32_t len, uint8_t *ip,
     if (rval == -pdFREERTOS_ERRNO_EINVAL) {
       /* Not a TCP socket */
       stat = IOT_SOCKET_EINVAL;
-    } else {
-      stat = (int32_t)rval;
+    }
+    else if (rval > 0) {
+      stat = 0;
+    }
+    else {
+      stat = IOT_SOCKET_EAGAIN;
     }
   }
   else if (buf == NULL) {
@@ -324,7 +349,7 @@ int32_t iotSocketRecvFrom (int32_t socket, void *buf, uint32_t len, uint8_t *ip,
 
 // Send data on a connected socket
 int32_t iotSocketSend (int32_t socket, const void *buf, uint32_t len) {
-  Socket_t xSocket =(Socket_t)socket;
+  Socket_t xSocket = (Socket_t)socket;
   struct freertos_sockaddr xAddress;
   socklen_t xAddressLength;
   BaseType_t rval;
@@ -375,7 +400,7 @@ int32_t iotSocketSend (int32_t socket, const void *buf, uint32_t len) {
 
 // Send data on a socket
 int32_t iotSocketSendTo (int32_t socket, const void *buf, uint32_t len, const uint8_t *ip, uint32_t ip_len, uint16_t port) {
-  Socket_t xSocket =(Socket_t)socket;
+  Socket_t xSocket = (Socket_t)socket;
   struct freertos_sockaddr xAddress;
   BaseType_t rval;
   int32_t stat;
@@ -399,7 +424,7 @@ int32_t iotSocketSendTo (int32_t socket, const void *buf, uint32_t len, const ui
     xAddress.sin_addr = FreeRTOS_inet_addr_quick (ip[0], ip[1], ip[2], ip[3]);
     xAddress.sin_port = FreeRTOS_htons (port);
 
-    rval = FreeRTOS_sendto (xSocket, buf, len, 0U, &xAddress, sizeof(struct freertos_sockaddr));
+    rval = FreeRTOS_sendto (xSocket, buf, len, 0U, &xAddress, sizeof(xAddress));
 
     /* Number of bytes queued for sending, 0 on error or timeout */
     stat = (int32_t)rval;
@@ -410,7 +435,7 @@ int32_t iotSocketSendTo (int32_t socket, const void *buf, uint32_t len, const ui
 
 // Retrieve local IP address and port of a socket
 int32_t iotSocketGetSockName (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t *port) {
-  Socket_t xSocket =(Socket_t)socket;
+  Socket_t xSocket = (Socket_t)socket;
   struct freertos_sockaddr xAddress;
   size_t rval;
   int32_t stat;
@@ -436,7 +461,7 @@ int32_t iotSocketGetSockName (int32_t socket, uint8_t *ip, uint32_t *ip_len, uin
 
 // Retrieve remote IP address and port of a socket
 int32_t iotSocketGetPeerName (int32_t socket, uint8_t *ip, uint32_t *ip_len, uint16_t *port) {
-  Socket_t xSocket =(Socket_t)socket;
+  Socket_t xSocket = (Socket_t)socket;
   struct freertos_sockaddr xAddress;
   size_t rval;
   int32_t stat;
@@ -469,7 +494,7 @@ int32_t iotSocketGetPeerName (int32_t socket, uint8_t *ip, uint32_t *ip_len, uin
 
 // Get socket option
 int32_t iotSocketGetOpt (int32_t socket, int32_t opt_id, void *opt_val, uint32_t *opt_len) {
-  Socket_t xSocket =(Socket_t)socket;
+  Socket_t xSocket = (Socket_t)socket;
   BaseType_t rval;
   int32_t stat;
 
@@ -506,7 +531,7 @@ int32_t iotSocketGetOpt (int32_t socket, int32_t opt_id, void *opt_val, uint32_t
 
 // Set socket option
 int32_t iotSocketSetOpt (int32_t socket, int32_t opt_id, const void *opt_val, uint32_t opt_len) {
-  Socket_t xSocket =(Socket_t)socket;
+  Socket_t xSocket = (Socket_t)socket;
   BaseType_t rval;
   TickType_t xTimeout;
   int32_t stat;
@@ -581,7 +606,7 @@ int32_t iotSocketSetOpt (int32_t socket, int32_t opt_id, const void *opt_val, ui
     stat = IOT_SOCKET_ENOTSUP;
   }
   else {
-      stat = IOT_SOCKET_EINVAL;
+    stat = IOT_SOCKET_EINVAL;
   }
 
   return stat;
@@ -589,7 +614,7 @@ int32_t iotSocketSetOpt (int32_t socket, int32_t opt_id, const void *opt_val, ui
 
 // Close and release a socket
 int32_t iotSocketClose (int32_t socket) {
-  Socket_t xSocket =(Socket_t)socket;
+  Socket_t xSocket = (Socket_t)socket;
   BaseType_t rval;
   TickType_t xTimeout;
   int32_t stat;

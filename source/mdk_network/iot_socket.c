@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Arm Limited. All rights reserved.
+ * Copyright (c) 2018-2026 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -18,6 +18,7 @@
 
 #include <string.h>
 #include "iot_socket.h"
+#include "cmsis_os2.h"
 #include "rl_net.h"
 #include "RTE_Components.h"
 
@@ -194,7 +195,11 @@ int32_t iotSocketBind (int32_t socket, const uint8_t *ip, uint32_t ip_len, uint1
   }
 
   rc = bind(socket, (SOCKADDR *)&addr, addr_len);
-  rc = rc_bsd_to_iot(rc);
+  if (rc == BSD_EISCONN) {
+    rc = IOT_SOCKET_ERROR;
+  } else {
+    rc = rc_bsd_to_iot(rc);
+  }
 
   return rc;
 }
@@ -411,15 +416,23 @@ static int32_t socket_check_write (int32_t socket) {
 
 // Send data on a connected socket
 int32_t iotSocketSend (int32_t socket, const void *buf, uint32_t len) {
+  int32_t retry;
   int32_t rc;
 
   if (len == 0U) {
     return socket_check_write (socket);
   }
 
-  rc = send(socket, buf, (int32_t)len, 0);
+  for (retry = 0U; retry < 5U; retry++) {
+    rc = send(socket, buf, (int32_t)len, 0);
+    if (rc != BSD_ENOMEM) {
+      break;
+    }
+    osDelay (retry + 2U);
+  }
+
   if (rc < 0) {
-    if (rc == BSD_ETIMEDOUT) {
+    if ((rc == BSD_ETIMEDOUT) || (rc == BSD_ENOMEM)) {
       rc = IOT_SOCKET_EAGAIN;
     } else {
       rc = rc_bsd_to_iot(rc);
@@ -468,6 +481,9 @@ int32_t iotSocketSendTo (int32_t socket, const void *buf, uint32_t len, const ui
 
   if (rc < 0) {
     if (rc == BSD_ETIMEDOUT) {
+      rc = IOT_SOCKET_EAGAIN;
+    } else if (rc == BSD_ENOMEM) {
+      osDelay (5U);
       rc = IOT_SOCKET_EAGAIN;
     } else {
       rc = rc_bsd_to_iot(rc);

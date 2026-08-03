@@ -15,6 +15,8 @@
   <releases>
     <release version="1.4.1-dev">
       Active Development ...
+      Aligned return codes with the documentation
+      Added the lwIP Socket layer
     </release>
   </releases>
   <apis>
@@ -81,7 +83,7 @@
         <file category="sourceC" name="source/vsocket/iot_socket.c"/>
       </files>
     </component>
-    <component Cclass="IoT Utility" Cgroup="Socket" Csub="MDK Network" Capiversion="1.2.0" Cversion="1.3.0" condition="MDK Network Stack">
+    <component Cclass="IoT Utility" Cgroup="Socket" Csub="MDK Network" Capiversion="1.2.0" Cversion="1.4.0" condition="MDK Network Stack">
       <description>IoT Socket implementation with MDK Network</description>
       <RTE_Components_h>
         <!-- the following content goes into file 'RTE_Components.h' -->
@@ -92,7 +94,7 @@
         <file category="sourceC" name="source/mdk_network/iot_socket.c"/>
       </files>
     </component>
-    <component Cclass="IoT Utility" Cgroup="Socket" Csub="FreeRTOS-Plus-TCP" Capiversion="1.2.0" Cversion="1.0.0" condition="FreeRTOS-Plus-TCP Stack">
+    <component Cclass="IoT Utility" Cgroup="Socket" Csub="FreeRTOS-Plus-TCP" Capiversion="1.2.0" Cversion="1.1.0" condition="FreeRTOS-Plus-TCP Stack">
       <description>IoT Socket implementation with FreeRTOS+ TCP</description>
       <RTE_Components_h>
         <!-- the following content goes into file 'RTE_Components.h' -->
